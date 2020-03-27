@@ -16,13 +16,13 @@
                     <b-button href="#" variant="primary" @click="$emit('view-folder', {title: title})">Quick View</b-button>
                 </b-col>
                 <b-col>
-                    <b-button href="#" variant="outline-primary">Edit</b-button>
+                    <b-button href="#" variant="danger">Import</b-button>
                 </b-col>
             </b-row>
             </b-container>
 
             <template v-slot:footer>
-                <em>Created </em>
+                <em>Created by AUTHOR</em>
             </template>
 
         </b-card>
@@ -31,7 +31,7 @@
 
 <script>
 export default {
-    name: "FolderCard",
+    name: "PublicFolderCard",
     components: {
 
     },

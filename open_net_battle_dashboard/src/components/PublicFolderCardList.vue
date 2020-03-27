@@ -10,17 +10,17 @@
 
     <ul :style="gridStyle" class="folder-card-list">
         <li v-bind:key="folder.id" v-for="folder in folders">
-            <FolderCard :title="folder.title" :count="folder.count" :date="folder.date" @view-folder="showModal"></FolderCard>
+            <PublicFolderCard :title="folder.title" :count="folder.count" :date="folder.date" @view-folder="showModal"></PublicFolderCard>
         </li>
     </ul>
 </div>
 </template>
 
 <script>
-import FolderCard from "./FolderCard";
+import PublicFolderCard from "./PublicFolderCard";
 
 export default {
-    name: "FolderCardList",
+    name: "PublicFolderCardList",
     data() {
         return {
             preview: { title: "" },
@@ -55,7 +55,7 @@ export default {
         }
     },
     components: {
-        FolderCard
+        PublicFolderCard
     },
     computed: {
         gridStyle() {

@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import App from './App.vue'
+import router  from './router'
 
 // This imports all the layout components such as <b-container>, <b-row>, <b-col>:
 import { LayoutPlugin } from 'bootstrap-vue'
@@ -31,6 +32,10 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.config.productionTip = false
 
+/* eslint-disable no-new */
 new Vue({
+  el: '#app',
+  router,
   render: h => h(App),
-}).$mount('#app')
+  components: { App }
+})
