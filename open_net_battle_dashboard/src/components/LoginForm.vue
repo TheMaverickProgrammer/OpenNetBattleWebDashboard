@@ -1,7 +1,7 @@
 <template>
   <div>
     <b-form class="position-relative p-3" @submit.prevent="onSubmit">
-      <b-form-group label="Username" label-for="form-name" label-cols-lg="2">
+      <b-form-group label="Name" label-for="form-name" label-cols-lg="2">
         <b-input-group>
           <b-input-group-prepend is-text>
             <b-icon icon="person-fill"></b-icon>
@@ -15,22 +15,6 @@
             <b-icon icon="lock-fill"></b-icon>
           </b-input-group-prepend>
           <b-form-input id="form-password" type="password" :disabled="busy"></b-form-input>
-        </b-input-group>
-      </b-form-group>
-      <b-form-group label="Email" label-for="form-mail" label-cols-lg="2">
-        <b-input-group>
-          <b-input-group-prepend is-text>
-            <b-icon icon="envelope-fill"></b-icon>
-          </b-input-group-prepend>
-          <b-form-input id="form-email" type="email" :disabled="busy"></b-form-input>
-        </b-input-group>
-      </b-form-group>
-      <b-form-group label="Twitter" label-for="form-twitter" label-cols-lg="2">
-        <b-input-group>
-          <b-input-group-prepend is-text>
-            <b-icon icon="bird-fill"></b-icon>
-          </b-input-group-prepend>
-          <b-form-input id="form-twitter" :disabled="busy"></b-form-input>
         </b-input-group>
       </b-form-group>
       <div class="d-flex justify-content-center">
@@ -122,7 +106,6 @@
             this.clearInterval()
             this.$nextTick(() => {
               this.busy = this.processing = false;
-              this.$emit('signup-complete');
             })
           }
         }, 350)
