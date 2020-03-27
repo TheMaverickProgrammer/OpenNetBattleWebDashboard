@@ -22,14 +22,17 @@
             </b-navbar-nav>
             </b-collapse>
         </b-navbar>
+        <Breadcrumb/>
     </div>
 </template>
 
 <script>
+import Breadcrumb from './Breadcrumb'
+
 export default {
     name: "Navbar",
     components: {
-
+        Breadcrumb
     },
     props: ["user"]
 }

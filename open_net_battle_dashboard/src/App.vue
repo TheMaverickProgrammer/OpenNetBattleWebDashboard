@@ -23,17 +23,27 @@ export default {
         { 
           id: 1,
           title: "TestFolder",
-          count: 10
+          count: 10,
+          date: Date.now()
         },
         { 
           id: 2,
           title: "NoobFolder",
-          count: 21
+          count: 21,
+          date: Date.now()
+
         },
         { 
           id: 3,
           title: "LanFlder",
-          count: 15
+          count: 15,
+          date: Date.now()
+        },
+        { 
+          id: 3,
+          title: "LanFlder",
+          count: 15,
+          date: Date.now()
         }
       ]
     }
