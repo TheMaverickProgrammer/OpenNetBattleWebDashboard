@@ -81,18 +81,24 @@
             this.counter = 1;
             this.processing = true;
 
+            let self = this;
+
             // Simulate an async request
             axios.get('http://battlenetwork.io:3000/v1/login', 
                 {
-                    useCredentials: true, 
+                    cancelToken: new axios.CancelToken(function executor(c) {
+                        self.cancelRequest = c;
+                    }),
+                    withCredentials: true, 
                     auth: { username: this.username, password: this.password },
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                 }, 
             )
             .then(response => {
-                this.$store.dispatch('setUser', response.data.user);
+                this.$store.dispatch('loginUser', response.data.user);
             }).catch(err => {
-                console.log("error: " + err);
+                let alert = { message: err, type: "danger" };
+                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
             }).finally(() => {
                 this.clearInterval();
                 this.busy = this.processing = false;
@@ -106,6 +112,7 @@
                     this.clearInterval()
                     this.$nextTick(() => {
                         this.busy = this.processing = false;
+                        this.cancelRequest("Login timeout");
                     })
                 }
             }, 350)

@@ -23,7 +23,29 @@ export default {
   components: {
     Navbar,
     Landing
-  }
+  },
+  methods: {
+    makeAlert(message, type) {
+      const capitalized = type.charAt(0).toUpperCase() + type.slice(1);
+      this.$bvToast.toast(String(message), {
+        title: capitalized,
+        autoHideDelay: 5000,
+        variant: type,
+        appendToast: false
+      });
+    }
+  },
+  created() {
+    this.unsubscribe = this.$store.subscribeAction((action) => {
+      if (action.type === 'alerts/addAlert') {
+        let alert = action.payload;
+        this.makeAlert(alert.message, alert.type);
+      }
+    });
+  },
+  beforeDestroy() {
+    this.unsubscribe();
+  },
 }
 </script>
 

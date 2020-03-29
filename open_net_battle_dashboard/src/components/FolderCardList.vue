@@ -1,16 +1,21 @@
 <template>
 <div>
-    <b-modal ref="folder-view-modal" hide-footer :title="preview.title">
+    <b-modal ref="folder-view-modal" hide-footer :title="preview.name">
       <div class="d-block text-center">
-        <h3>Hello From Folder View Modal!</h3>
+        <h3>Cards:</h3>
+        <ul>
+            <li v-bind:key="card" v-for="card in preview.cards">
+                {{ card }}
+            </li>
+        </ul>
       </div>
       <b-button class="mt-3" variant="outline-danger" block @click="hideModal">Share</b-button>
       <b-button class="mt-2" variant="outline-warning" block @click="hideModal">Edit</b-button>
     </b-modal>
 
     <ul :style="gridStyle" class="folder-card-list">
-        <li v-bind:key="folder.id" v-for="folder in folders">
-            <FolderCard :title="folder.title" :count="folder.count" :date="folder.date" @view-folder="showModal"></FolderCard>
+        <li v-bind:key="folder.id" v-for="folder in $store.state.folders.list">
+            <FolderCard :title="folder.name" :cards="folder.cards" :date="folder.timestamp" @view-folder="showModal"></FolderCard>
         </li>
     </ul>
 </div>
@@ -18,40 +23,14 @@
 
 <script>
 import FolderCard from "./FolderCard";
+import axios from 'axios'
 
 export default {
     name: "FolderCardList",
     data() {
         return {
-            preview: { title: "" },
-            numberOfColumns: 3,
-            folders: [
-                { 
-                id: 1,
-                title: "TestFolder",
-                count: 10,
-                date: Date.now()
-                },
-                { 
-                id: 2,
-                title: "NoobFolder",
-                count: 21,
-                date: Date.now()
-
-                },
-                { 
-                id: 3,
-                title: "LanFlder",
-                count: 15,
-                date: Date.now()
-                },
-                { 
-                id: 4,
-                title: "LanFlder",
-                count: 15,
-                date: Date.now()
-                }
-            ]
+            preview: { name: "", cards: [], timestamp: "" },
+            numberOfColumns: 3
         }
     },
     components: {
@@ -73,6 +52,29 @@ export default {
         this.$refs['folder-view-modal'].hide();
       }
     },
+    mounted() {
+        // Simulate an async request
+        axios.get('http://battlenetwork.io:3000/v1/folders', 
+            {
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                withCredentials: true
+            }, 
+        )
+        .then(response => {
+            console.log(response);
+            let payload = response.data;
+            
+            payload.data.forEach( element => {
+                this.$store.dispatch('folders/addFolder', element, { namespaced: true});
+            });
+        }).catch(err => {
+            let alert = { message: err, type: "danger" };
+            this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+        }).finally(() => {
+            //this.clearInterval();
+            //this.busy = this.processing = false;
+        });
+    }
 }
 </script>
 

@@ -3,6 +3,7 @@ import Vuex from 'vuex'
 
 import { folders } from './modules/folders'
 import { cards } from './modules/cards'
+import { alerts } from './modules/alerts'
 
 Vue.use(Vuex);
 
@@ -25,12 +26,24 @@ export default new Vuex.Store({
         }
     },
     actions: {
-        setUser(context, user) {
+        loginUser(context, user) {
+            context.commit('doSetUser', user);
+        },
+        logoutUser(context) {
+            let user = {
+                username: "",
+                userId: "",
+                email: "",
+                twitter: "",
+                isAdmin: false
+            };
+
             context.commit('doSetUser', user);
         }
     },
     modules: {
         folders,
-        cards
+        cards,
+        alerts
     }
 });

@@ -18,7 +18,7 @@
                     <template v-slot:button-content>
                         <em>Welcome, {{user}}</em>
                     </template>
-                    <b-dropdown-item href="#">Sign Out</b-dropdown-item>
+                    <b-dropdown-item href="#" @click="handleLogout">Sign Out</b-dropdown-item>
                 </b-nav-item-dropdown>
             </b-navbar-nav>
             </b-collapse>
@@ -35,7 +35,12 @@ export default {
     components: {
         Breadcrumb
     },
-    props: ["user"]
+    props: ["user"],
+    methods: {
+        handleLogout() {
+            this.$store.dispatch('logoutUser');
+        }
+    }
 }
 </script>
 

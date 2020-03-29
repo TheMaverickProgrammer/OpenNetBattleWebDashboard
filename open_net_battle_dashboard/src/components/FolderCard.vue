@@ -7,13 +7,13 @@
             class="mb-2 folder-card"
         >
             <b-card-text>
-                {{this.count}} / 30 cards
+                {{this.cards.length}} / 30 cards
             </b-card-text>
 
             <b-container class="bv-example-row">
             <b-row>
                 <b-col>
-                    <b-button href="#" variant="primary" @click="$emit('view-folder', {title: title})">Quick View</b-button>
+                    <b-button href="#" variant="primary" @click="$emit('view-folder', getSelf)">Quick View</b-button>
                 </b-col>
                 <b-col>
                     <b-button href="#" variant="outline-primary">Edit</b-button>
@@ -35,7 +35,12 @@ export default {
     components: {
 
     },
-    props: ["id", "title", "count", "date"]
+    computed: {
+        getSelf() {
+            return {title: this.title, cards: this.cards, date: this.date, id: this.id};
+        }
+    },
+    props: ["id", "title", "cards", "date"]
 }
 </script>
 
