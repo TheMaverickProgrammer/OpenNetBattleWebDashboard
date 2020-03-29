@@ -10,6 +10,9 @@ export const folders = {
         },
         doRemoveFolder(state, folderIndex) {
             state.list.splice(folderIndex, 1);
+        },
+        doClearFolders(state) {
+            state.list = []
         }
     },
     actions: {
@@ -18,6 +21,9 @@ export const folders = {
         },
         removeFolder(context, index) {
             context.commit('doRemoveFolder', index);
+        },
+        clearFolders(context) {
+            context.commit('doClearFolders');
         }
     }
 }

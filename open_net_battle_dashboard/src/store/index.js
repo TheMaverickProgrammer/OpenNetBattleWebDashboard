@@ -39,6 +39,9 @@ export default new Vuex.Store({
             };
 
             context.commit('doSetUser', user);
+
+            this.dispatch('folders/clearFolders', { namespaced: true});
+            this.dispatch('cards/clearCards', { namespaced: true});
         }
     },
     modules: {

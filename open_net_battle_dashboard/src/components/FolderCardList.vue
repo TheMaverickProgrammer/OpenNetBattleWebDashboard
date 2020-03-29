@@ -4,8 +4,8 @@
       <div class="d-block text-center">
         <h3>Cards:</h3>
         <ul>
-            <li v-bind:key="card" v-for="card in preview.cards">
-                {{ card }}
+            <li v-bind:key="id" v-for="id in preview.cards">
+                <img :src="$store.getters.getCardById(id).image"/> {{ $store.getters.getCardById(id).name }} {{ $store.getters.getCardById(id).code }}
             </li>
         </ul>
       </div>
@@ -61,7 +61,6 @@ export default {
             }, 
         )
         .then(response => {
-            console.log(response);
             let payload = response.data;
             
             payload.data.forEach( element => {

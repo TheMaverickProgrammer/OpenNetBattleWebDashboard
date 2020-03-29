@@ -29,6 +29,7 @@
 
 <script>
 import Breadcrumb from './Breadcrumb'
+import axios from 'axios';
 
 export default {
     name: "Navbar",
@@ -38,7 +39,19 @@ export default {
     props: ["user"],
     methods: {
         handleLogout() {
-            this.$store.dispatch('logoutUser');
+            // Simulate an async request
+            axios.get('http://battlenetwork.io:3000/v1/logout', 
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                }, 
+            )
+            .then(() => {
+                this.$store.dispatch('logoutUser');
+            }).catch(err => {
+                let alert = { message: err, type: "danger" };
+                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+            });
         }
     }
 }

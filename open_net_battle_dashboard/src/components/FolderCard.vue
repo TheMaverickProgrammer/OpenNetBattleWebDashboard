@@ -7,7 +7,7 @@
             class="mb-2 folder-card"
         >
             <b-card-text>
-                {{this.cards.length}} / 30 cards
+                {{cards.length}} / 30 cards
             </b-card-text>
 
             <b-container class="bv-example-row">
@@ -22,7 +22,7 @@
             </b-container>
 
             <template v-slot:footer>
-                <em>Created </em>
+                <em>Created {{date}}</em>
             </template>
 
         </b-card>
