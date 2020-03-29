@@ -6,7 +6,7 @@
           <b-input-group-prepend is-text>
             <b-icon icon="person-fill"></b-icon>
           </b-input-group-prepend>
-          <b-form-input id="form-name" :disabled="busy"></b-form-input>
+          <b-form-input id="form-name" :disabled="busy" v-model="username"></b-form-input>
         </b-input-group>
       </b-form-group>
       <b-form-group label="Password" label-for="form-password" label-cols-lg="2">
@@ -14,14 +14,15 @@
           <b-input-group-prepend is-text>
             <b-icon icon="lock-fill"></b-icon>
           </b-input-group-prepend>
-          <b-form-input id="form-password" type="password" :disabled="busy"></b-form-input>
+          <b-form-input id="form-password" type="password" :disabled="busy" v-model="password"></b-form-input>
         </b-input-group>
       </b-form-group>
       <div class="d-flex justify-content-center">
          <b-button ref="submit" type="submit" :disabled="busy">Submit</b-button>
+         <b-button ref="cancel" :disabled="busy" @click="cancelLoginAction">Go Back</b-button>
       </div>
 
-      <b-overlay :show="busy" no-wrap @shown="onShown" @hidden="onHidden">
+      <b-overlay :show="busy" no-wrap>
         <template v-slot:overlay>
           <div v-if="processing" class="text-center p-4 bg-primary text-light rounded">
             <b-icon icon="cloud-upload" font-scale="4"></b-icon>
@@ -44,13 +45,6 @@
             aria-labelledby="form-confirm-label"
             class="text-center p-3"
           >
-            <p><strong id="form-confirm-label">Are you sure?</strong></p>
-            <div class="d-flex">
-              <b-button variant="outline-danger" class="mr-3" @click="onCancel">
-                Cancel
-              </b-button>
-              <b-button variant="outline-success" @click="onOK">OK</b-button>
-            </div>
           </div>
         </template>
       </b-overlay>
@@ -59,57 +53,66 @@
 </template>
 
 <script>
-  export default {
+    import axios from 'axios'
+
+    export default {
     data() {
-      return {
-        busy: false,
-        processing: false,
-        counter: 1,
-        interval: null
-      }
+        return {
+            busy: false,
+            processing: false,
+            counter: 1,
+            interval: null,
+            username: "",
+            password: ""
+        }
     },
     beforeDestroy() {
-      this.clearInterval()
+        this.clearInterval()
     },
     methods: {
-      clearInterval() {
-        if (this.interval) {
-          clearInterval(this.interval)
-          this.interval = null
-        }
-      },
-      onShown() {
-        // Focus the dialog prompt
-        this.$refs.dialog.focus()
-      },
-      onHidden() {
-        // In this case, we return focus to the submit button
-        // You may need to alter this based on your application requirements
-        this.$refs.submit.focus()
-      },
-      onSubmit() {
-        this.processing = false
-        this.busy = true
-      },
-      onCancel() {
-        this.busy = false
-      },
-      onOK() {
-        this.counter = 1
-        this.processing = true
-        // Simulate an async request
-        this.clearInterval()
-        this.interval = setInterval(() => {
-          if (this.counter < 20) {
-            this.counter = this.counter + 1
-          } else {
+        clearInterval() {
+            if (this.interval) {
+                clearInterval(this.interval)
+                this.interval = null
+            }
+        },
+        onSubmit() {
+            this.busy = true;
+            this.counter = 1;
+            this.processing = true;
+
+            // Simulate an async request
+            axios.get('http://battlenetwork.io:3000/v1/login', 
+                {
+                    useCredentials: true, 
+                    auth: { username: this.username, password: this.password },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                }, 
+            )
+            .then(response => {
+                this.$store.dispatch('setUser', response.data.user);
+            }).catch(err => {
+                console.log("error: " + err);
+            }).finally(() => {
+                this.clearInterval();
+                this.busy = this.processing = false;
+            });
+
             this.clearInterval()
-            this.$nextTick(() => {
-              this.busy = this.processing = false;
-            })
-          }
-        }, 350)
-      }
+            this.interval = setInterval(() => {
+                if (this.counter < 20) {
+                    this.counter = this.counter + 1
+                } else {
+                    this.clearInterval()
+                    this.$nextTick(() => {
+                        this.busy = this.processing = false;
+                    })
+                }
+            }, 350)
+        },
+        cancelLoginAction() {
+            this.$emit('cancel-action');
+        }
     }
-  }
+}
 </script>

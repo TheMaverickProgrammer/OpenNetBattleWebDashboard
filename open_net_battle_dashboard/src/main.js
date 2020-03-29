@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router  from './router'
+import store from './store/'
 
 // This imports all the layout components such as <b-container>, <b-row>, <b-col>:
 import { LayoutPlugin } from 'bootstrap-vue'
@@ -36,6 +37,7 @@ Vue.config.productionTip = false
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App),
   components: { App }
 })

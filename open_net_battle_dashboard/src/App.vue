@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <div id="app-content">
-      <div v-if="isLoggedIn">
-        <Navbar user="JamesKing"/>
+      <div v-if="$store.state.user.username != ''">
+        <Navbar :user="$store.state.user.username"/>
         <div> 
           <router-view/>
         </div>
@@ -41,5 +41,6 @@ export default {
   margin-left: 5%;
   margin-right: 5%;
   background-color:white;
+  height: 100vh;
 }
 </style>

@@ -5,10 +5,10 @@
             <b-button @click="handleSignup">Signup</b-button>
         </div>
         <div v-else-if="show=='signup'">
-            <SignupForm @signup-complete="handleSignupCompleted"></SignupForm>
+            <SignupForm @signup-complete="handleSignupCompleted" @cancel-action="handleReset"></SignupForm>
         </div>
         <div v-else-if="show=='login'">
-            <LoginForm/>
+            <LoginForm @cancel-action="handleReset"/>
         </div>
     </div>
 </template>
@@ -31,6 +31,9 @@ export default {
             this.show = "signup";
         },
         handleSignupCompleted() {
+            this.show = "none";
+        },
+        handleReset() {
             this.show = "none";
         }
     },

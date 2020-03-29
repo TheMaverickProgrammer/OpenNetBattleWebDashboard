@@ -35,6 +35,7 @@
       </b-form-group>
       <div class="d-flex justify-content-center">
          <b-button ref="submit" type="submit" :disabled="busy">Submit</b-button>
+         <b-button ref="cancel" :disabled="busy" @click="cancelSignupAction">Go Back</b-button>
       </div>
 
       <b-overlay :show="busy" no-wrap @shown="onShown" @hidden="onHidden">
@@ -108,7 +109,10 @@
         this.busy = true
       },
       onCancel() {
-        this.busy = false
+        this.busy = false;
+      },
+      cancelSignupAction() {
+        this.$emit('cancel-action');
       },
       onOK() {
         this.counter = 1

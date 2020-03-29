@@ -1,5 +1,12 @@
 <template>
   <div>
+    <b-modal ref="folder-view-modal" hide-footer :title="preview.name">
+      <div class="d-block text-center">
+        <h3>Hello From Card View Modal!</h3>
+      </div>
+      <b-button class="mt-2" variant="outline-primary" block @click="hideModal">Close</b-button>
+    </b-modal>
+
     <b-table
       sticky-header
       ref="selectableTable"
@@ -8,7 +15,7 @@
       :items="items"
       :fields="fields"
       @row-selected="onRowSelected"
-      responsive="sm"
+      responsive="lg"
     >
       <!-- Example scoped slot for select state illustrative purposes -->
       <template v-slot:cell(selected)="{ rowSelected }">
@@ -37,6 +44,7 @@
   export default {
     data() {
       return {
+        preview: { name: "" },
         fields: [ 
             { key: 'icon', sortable: false },
             { key: 'name', sortable: true },
@@ -76,6 +84,13 @@
       },
       clearSelected() {
         this.$refs.selectableTable.clearSelected()
+      },
+      showModal(card) {
+        this.preview = card;
+        this.$refs['card-view-modal'].show();
+      },
+      hideModal() {
+        this.$refs['card-view-modal'].hide();
       }
     }
   }
