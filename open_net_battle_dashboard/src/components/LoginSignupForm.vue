@@ -15,6 +15,7 @@
       <div :class="{ 'white-panel': true, 'right-log': !showLoginForm}">
         <!-- login form -->
         <b-form :class="{ 'login-show': true, 'show-log-panel': showLoginForm}" @submit.prevent="onSubmit">
+          <h2>Login</h2>
           <b-form-group label-for="form-name" label-cols-lg="2">
             <b-input-group>
               <b-input-group-prepend is-text>
@@ -37,12 +38,13 @@
         </b-form>
         <!-- signup form -->
         <b-form :class="{ 'register-show': true, 'show-log-panel': !showLoginForm}" @submit.prevent="onSubmit">
+          <h2>Create Account</h2>
           <b-form-group label="Username" label-for="form-name" label-cols-lg="2">
             <b-input-group>
               <b-input-group-prepend is-text>
                 <b-icon icon="person-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input id="form-name" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Username" id="form-name" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label="Password" label-for="form-password" label-cols-lg="2">
@@ -50,7 +52,15 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="lock-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input id="form-password" type="password" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Password" id="form-password" type="password" :disabled="busy"></b-form-input>
+            </b-input-group>
+          </b-form-group>
+          <b-form-group label="Re-enter" label-for="form-confirm-password" label-cols-lg="2">
+            <b-input-group>
+              <b-input-group-prepend is-text>
+                <b-icon icon="lock-fill"></b-icon>
+              </b-input-group-prepend>
+              <b-form-input placeholder="Re-enter password" id="form-confirm-password" type="password" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label="Email" label-for="form-mail" label-cols-lg="2">
@@ -58,15 +68,15 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="envelope-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input id="form-email" type="email" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Email" id="form-email" type="email" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label="Twitter" label-for="form-twitter" label-cols-lg="2">
             <b-input-group>
               <b-input-group-prepend is-text>
-                <b-icon icon="bird-fill"></b-icon>
+                <b-icon icon="at"></b-icon>
               </b-input-group-prepend>
-              <b-form-input id="form-twitter" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Handle" id="form-twitter" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
           <div class="d-flex justify-content-center">
