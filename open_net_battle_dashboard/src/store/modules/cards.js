@@ -4,10 +4,13 @@ export const cards = {
         list: []
     },
     getters: {
-        getCardById(state, id) {
-            state.list.filter(card => {
-                return card._id == id
-            });
+        getCardById: (state) => (id) => {
+            return state.list.find( card => card._id == id) 
+                || { 
+                    name: "-", image: "", code: "-", codeFamily: [],
+                    element: "-", secondaryElement: "-", damage: 0,
+                    description: "N/A", verboseDescription: "N/A" 
+                };
         }
     },
     mutations: {

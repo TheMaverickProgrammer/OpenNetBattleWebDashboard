@@ -7,22 +7,38 @@
       <b-button class="mt-2" variant="outline-primary" block @click="hideModal">Close</b-button>
     </b-modal>
 
+    <b-pagination
+      v-model="currentPage"
+      :total-rows="rows"
+      :per-page="perPage"
+      aria-controls="card-table"
+      align="center"
+    ></b-pagination>
+
     <b-table
-      sticky-header
+      id="card-table"
+      sticky-header="max-content"
       ref="selectableTable"
       selectable
-      select-mode="multi"
+      :select-mode="selectMode"
       :items="$store.state.cards.list"
       :fields="fields"
       :busy="isBusy"
       @row-selected="onRowSelected"
       responsive="lg"
+      :per-page="perPage"
+      :current-page="currentPage"
     >
       <template v-slot:table-busy>
         <div class="text-center text-danger my-2">
           <b-spinner class="align-middle"></b-spinner>
           <strong>Loading...</strong>
         </div>
+      </template>
+
+      <!-- A custom formatted column -->
+      <template v-slot:cell(index)="data">
+        {{ data.index + 1 }}
       </template>
 
       <!-- A custom formatted column -->
@@ -76,9 +92,11 @@
       <b-button size="sm" @click="selectAllRows">Select all</b-button>
       <b-button size="sm" @click="clearSelected">Clear selected</b-button>
     </p>
-    <p>
-      Selected Rows:<br>
-      {{ selected }}
+    <p v-if="selected.length > 0">
+      Selected:<br>
+      <span :key="card._id" v-for="card in selected">
+          <img :src="card.image"/>
+      </span>
     </p>
   </div>
 </template>
@@ -91,6 +109,7 @@ export default {
         return {
             preview: { name: "" },
             fields: [ 
+                'index',
                 { key: 'image', sortable: false },
                 { key: 'icon', sortable: false },
                 { key: 'name', sortable: true },
@@ -102,13 +121,16 @@ export default {
                 { key: 'verboseDescription', sortable: false}
             ],
             selectMode: 'multi',
-            selected: [],
-            isBusy: false
+            selected: { verboseDescription: ''},
+            isBusy: false,
+            perPage: 8,
+            currentPage: 1,
+            rows: 0
         }
     },
     methods: {
         onRowSelected(items) {
-            this.selected = items
+            this.selected = items;
         },
         selectAllRows() {
             this.$refs.selectableTable.selectAllRows()
@@ -124,7 +146,9 @@ export default {
             this.$refs['card-view-modal'].hide();
         }
     },
-    mounted() {
+    created() {
+        this.$store.dispatch('cards/clearCards', {namespaced: true});
+
         this.isBusy = true;
 
         let numOfCards = 0;
@@ -160,6 +184,8 @@ export default {
 
                     let cardEntry = model; // explicit card detail is provided in a property
                     cardEntry.code = code; // Map this card's code back
+                    cardEntry._id = cardId; // Make sure to use change the ID back to the card ID
+                    cardEntry.codeFamily = cardEntry.codes; // Rename plural `codes` to something safer
                     delete cardEntry.codes; // plural `codes` array is only used by the model 
                     this.$store.dispatch('cards/addCard', cardEntry, { namespaced: true});
                 }).catch(err => {
@@ -171,6 +197,8 @@ export default {
                     if(cardIndex == numOfCards) {
                         self.isBusy = false; // Done
                     }
+
+                    self.rows = cardIndex;
                 });
             });
         }).catch(err => {
@@ -180,3 +208,6 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+</style>

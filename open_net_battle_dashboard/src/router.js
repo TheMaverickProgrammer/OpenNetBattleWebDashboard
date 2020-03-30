@@ -13,22 +13,44 @@ export default new Router({
       path: '/',
       name: 'Home',
       component: Home,
-      props: {isAdmin:true}
+      meta: {
+          breadcrumb: [
+              { name: 'Home'}
+          ]
+      }
     },
     {
       path: '/folders',
       name: 'FolderListPage',
-      component: FolderCardList
+      component: FolderCardList,
+      meta: {
+        breadcrumb: [
+            { name: 'Home', link: '/'},
+            { name: 'My Folders'}
+        ]
+    }
     },
     {
         path: '/cards',
         name: 'GameCardsListPage',
         component: GameCardTableList,
+        meta: {
+            breadcrumb: [
+                { name: 'Home', link: '/'},
+                { name: 'All Cards'}
+            ]
+        }
     },
     {
       path: '/public-folders',
       name: 'PublicFolderListPage',
-      component: PublicFolderCardList
+      component: PublicFolderCardList,
+      meta: {
+        breadcrumb: [
+            { name: 'Home', link: '/'},
+            { name: 'Public Folders' }
+        ]
+    }
     }
   ]
 })

@@ -96,6 +96,9 @@
             )
             .then(response => {
                 this.$store.dispatch('loginUser', response.data.user);
+
+                let alert = { message: "Welcome to cyberworld, " + response.data.user.username + "!", type: "success" };
+                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
             }).catch(err => {
                 let alert = { message: err, type: "danger" };
                 this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});

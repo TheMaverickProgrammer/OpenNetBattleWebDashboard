@@ -1,7 +1,7 @@
 <template>
     <div>
         <p>Click on a link to get started</p>
-        <div v-if="isAdmin">
+        <div v-if="$store.state.user.isAdmin">
             <hr/>
             <h1>Admin commands</h1>
             <ul>
@@ -13,7 +13,6 @@
 
 <script>
 export default {
-    props: ["isAdmin"],
 }
 </script>
 
