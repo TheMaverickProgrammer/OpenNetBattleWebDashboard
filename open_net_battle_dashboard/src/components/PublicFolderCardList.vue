@@ -34,7 +34,7 @@ import FolderCard from "./FolderCard";
 import { mapGetters } from 'vuex'
 
 export default {
-    name: "FolderCardList",
+    name: "PublicFolderCardList",
     data() {
         return {
             preview: { name: "", cards: [], timestamp: "" },

@@ -42,15 +42,15 @@ export default new Router({
         }
     },
     {
-      path: '/public-folders',
-      name: 'PublicFolderListPage',
-      component: PublicFolderCardList,
-      meta: {
+        path: '/public-folders',
+        name: 'PublicFolderListPage',
+        component: PublicFolderCardList,
+        meta: {
         breadcrumb: [
             { name: 'Home', link: '/'},
             { name: 'Public Folders' }
-        ]
-    }
+            ]
+        }
     }
   ]
 })

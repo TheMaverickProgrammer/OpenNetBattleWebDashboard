@@ -1,21 +1,11 @@
 <template>
-    <div>
-        <div v-if="show=='none'">
-            <b-button @click="handleLogin">Login</b-button>
-            <b-button @click="handleSignup">Signup</b-button>
-        </div>
-        <div v-else-if="show=='signup'">
-            <SignupForm @signup-complete="handleSignupCompleted" @cancel-action="handleReset"></SignupForm>
-        </div>
-        <div v-else-if="show=='login'">
-            <LoginForm @cancel-action="handleReset"/>
-        </div>
+    <div class="landing">
+        <LoginSignupForm/>
     </div>
 </template>
 
 <script>
-import SignupForm from './SignupForm'
-import LoginForm from './LoginForm'
+import LoginSignupForm from './LoginSignupForm'
 
 export default {
     data() {
@@ -38,12 +28,20 @@ export default {
         }
     },
     components: { 
-        SignupForm,
-        LoginForm
+        LoginSignupForm
     }
 }
 </script>
 
 <style scoped>
-
+.landing {
+	height:100vh;
+	min-height:550px;
+	background-image: url(http://www.planwallpaper.com/static/images/Free-Wallpaper-Nature-Scenes.jpg);
+	background-repeat: no-repeat;
+	background-size:cover;
+	background-position:center;
+	position:relative;
+    overflow-y: hidden;
+}
 </style>

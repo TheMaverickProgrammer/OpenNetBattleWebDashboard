@@ -114,9 +114,6 @@ export default {
         }).catch(err => {
             let alert = { message: err, type: "danger" };
             this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-        }).finally(() => {
-            //this.clearInterval();
-            //this.busy = this.processing = false;
         });
     }
 }

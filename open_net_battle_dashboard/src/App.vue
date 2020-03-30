@@ -1,15 +1,13 @@
 <template>
   <div id="app">
-    <div id="app-content">
-      <div v-if="$store.state.user.username != ''">
+    <div v-if="$store.state.user.username != ''">
+      <div id="app-content"> 
         <Navbar :user="$store.state.user.username"/>
-        <div> 
-          <router-view/>
-        </div>
+        <router-view/>
       </div>
-      <div v-else>
-        <Landing/>
-      </div>
+    </div>
+    <div v-else>
+      <Landing/>
     </div>
   </div>
 </template>

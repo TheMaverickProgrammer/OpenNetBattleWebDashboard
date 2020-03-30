@@ -1,4 +1,4 @@
-export const folders = {
+export const publicFolders = {
     namespaced: true,
     state: {
         list: []
