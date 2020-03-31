@@ -5,7 +5,7 @@ export const cards = {
     },
     getters: {
         getCardById: (state) => (id) => {
-            return state.list.find( card => card._id == id) 
+            return state.list.find( card => card.id == id) 
                 || { 
                     name: "-", image: "", code: "-", codeFamily: [],
                     element: "-", secondaryElement: "-", damage: 0,
@@ -15,6 +15,8 @@ export const cards = {
     },
     mutations: {
         doAddCard(state, card) {
+            card.id = card._id;
+            delete card._id;
             state.list = [card, ...state.list];
         },
         doRemoveCard(state, cardIndex) {

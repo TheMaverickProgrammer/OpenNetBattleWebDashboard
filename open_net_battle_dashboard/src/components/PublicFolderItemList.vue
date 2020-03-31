@@ -22,19 +22,19 @@
 
     <ul :style="gridStyle" class="folder-card-list">
         <li v-bind:key="folder.id" v-for="folder in $store.state.publicFolders.list">
-            <FolderCard :title="folder.name" :cards="folder.cards" :date="folder.timestamp" @view-folder="showModal"></FolderCard>
+            <FolderItem :title="folder.name" :cards="folder.cards" :date="folder.timestamp" @view-folder="showModal"></FolderItem>
         </li>
     </ul>
 </div>
 </template>
 
 <script>
-import FolderCard from "./FolderCard";
+import FolderItem from "./FolderItem";
 // import axios from 'axios'
 import { mapGetters } from 'vuex'
 
 export default {
-    name: "PublicFolderCardList",
+    name: "PublicFolderItemList",
     data() {
         return {
             preview: { name: "", cards: [], timestamp: "" },
@@ -42,7 +42,7 @@ export default {
         }
     },
     components: {
-        FolderCard
+        FolderItem
     },
     computed: {
         gridStyle() {
@@ -79,7 +79,7 @@ export default {
           })
           .catch(err => {
               // An error occurred
-              const alert = { message: err, type: 'danger'};
+              const alert = { message: err, type: 'danger', title: "Internal Error"};
               this.$store.dispatch('alerts/addAlert', alert);
           })
       }

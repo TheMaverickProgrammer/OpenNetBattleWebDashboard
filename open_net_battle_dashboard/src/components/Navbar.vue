@@ -1,14 +1,14 @@
 <template>
     <div>
         <b-navbar toggleable="lg" type="dark" variant="info">
-            <b-navbar-brand href="#"><router-link to="/" class="no-link">Home</router-link></b-navbar-brand>
+            <b-navbar-brand :to="{path: '/'}" class="no-link"><b-icon-house-fill/></b-navbar-brand>
             <b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
             <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
-                <b-nav-item href="#"><router-link to="/folders" class="no-link">Folders</router-link></b-nav-item>
-                <b-nav-item href="#"><router-link to="/cards" class="no-link">All Cards</router-link></b-nav-item>
-                <b-nav-item href="#"><router-link to="/public-folders" class="no-link">Public Folders</router-link></b-nav-item>
+                <b-nav-item :to="{ path: '/folders' }" class="no-link">Folders</b-nav-item>
+                <b-nav-item :to="{ path: '/cards' }" class="no-link">All Cards</b-nav-item>
+                <b-nav-item :to="{ path: '/public-folders'}" class="no-link">Public Folders</b-nav-item>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->
@@ -16,9 +16,9 @@
                 <b-nav-item-dropdown right>
                     <!-- Using 'button-content' slot -->
                     <template v-slot:button-content>
-                        <em>Welcome, {{user}}</em>
+                        <b-icon icon="person-fill"/>{{user}}
                     </template>
-                    <b-dropdown-item href="#" @click="handleLogout">Sign Out</b-dropdown-item>
+                    <b-dropdown-item href="#" @click="handleLogout"><b-icon icon="power"/>Logout</b-dropdown-item>
                 </b-nav-item-dropdown>
             </b-navbar-nav>
             </b-collapse>
@@ -60,7 +60,7 @@ export default {
 <style scoped>
 .no-link {
     text-decoration: none;
-    color: inherit;
     font: inherit;
+    color:inherit;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="app-background">
         <p>Click on a link to get started</p>
         <div v-if="$store.state.user.isAdmin">
             <hr/>
@@ -17,5 +17,7 @@ export default {
 </script>
 
 <style scoped>
-
+p {
+    padding: 2%;
+}
 </style>

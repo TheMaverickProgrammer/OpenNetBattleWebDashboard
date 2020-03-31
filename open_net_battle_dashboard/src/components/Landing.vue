@@ -38,14 +38,10 @@ export default {
 
 <style scoped>
 .landing {
-	height:100vh;
-	min-height:550px;
-	background-image: url(../assets/ow.gif);
-	background-repeat: no-repeat;
-	background-size:cover;
-	background-position:center;
-	position:relative;
-    overflow-y:hidden;
+  height:100vh;
+  min-height:550px;
+  position:relative;
+  overflow-y:hidden;
 }
 
 .title {

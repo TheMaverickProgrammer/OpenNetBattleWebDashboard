@@ -11,7 +11,7 @@
 export default {
     data() { 
         return {
-            breadcrumb: []
+            breadcrumb: this.$route.meta.breadcrumb
         }
     },
     methods: {
@@ -29,4 +29,28 @@ export default {
 </script>
 
 <style scoped>
+.breadcrumb {
+    padding: 0.75rem 1rem;
+    background-color: #00000066;
+    border-radius: 0px;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+a {
+  color: aquamarine;  
+}
+
+a:hover {
+    color: aquamarine;
+    text-decoration: white underline;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+    color: white;
+}
+
+.breadcrumb-item.active {
+    color: white;
+}
 </style>

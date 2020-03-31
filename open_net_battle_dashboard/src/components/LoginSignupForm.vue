@@ -1,13 +1,13 @@
 <template>
   <div class="login-reg-panel">
       <!-- login question toggle -->
-      <div class="login-info-box">
+      <div class="login-info-box" v-if="!showLoginForm">
         <h2>I already have an account</h2>
         <b-button id="label-register" for="log-reg-show" @click="onToggleForm">Login</b-button>
       </div>
 
       <!-- signup question toggle -->
-      <div class="register-info-box">
+      <div class="register-info-box" v-if="showLoginForm">
         <h2>Don't have an account?</h2>
         <b-button id="label-login" for="log-login-show" @click="onToggleForm">Signup</b-button>
       </div>
@@ -33,13 +33,13 @@
             </b-input-group>
           </b-form-group>
           <div class="d-flex justify-content-center">
-            <b-button ref="submit" type="submit" :disabled="busy">Submit</b-button>
+            <b-button class="submit" ref="submit" type="submit" :disabled="busy">Submit</b-button>
           </div>
         </b-form>
         <!-- signup form -->
         <b-form :class="{ 'register-show': true, 'show-log-panel': !showLoginForm}" @submit.prevent="onSubmit">
           <h2>Create Account</h2>
-          <b-form-group label="Username" label-for="form-name" label-cols-lg="2">
+          <b-form-group label-for="form-name" label-cols-lg="2">
             <b-input-group>
               <b-input-group-prepend is-text>
                 <b-icon icon="person-fill"></b-icon>
@@ -47,7 +47,7 @@
               <b-form-input placeholder="Username" id="form-name" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
-          <b-form-group label="Password" label-for="form-password" label-cols-lg="2">
+          <b-form-group label-for="form-password" label-cols-lg="2">
             <b-input-group>
               <b-input-group-prepend is-text>
                 <b-icon icon="lock-fill"></b-icon>
@@ -55,7 +55,7 @@
               <b-form-input placeholder="Password" id="form-password" type="password" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
-          <b-form-group label="Re-enter" label-for="form-confirm-password" label-cols-lg="2">
+          <b-form-group label-for="form-confirm-password" label-cols-lg="2">
             <b-input-group>
               <b-input-group-prepend is-text>
                 <b-icon icon="lock-fill"></b-icon>
@@ -63,7 +63,7 @@
               <b-form-input placeholder="Re-enter password" id="form-confirm-password" type="password" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
-          <b-form-group label="Email" label-for="form-mail" label-cols-lg="2">
+          <b-form-group label-for="form-mail" label-cols-lg="2">
             <b-input-group>
               <b-input-group-prepend is-text>
                 <b-icon icon="envelope-fill"></b-icon>
@@ -71,23 +71,23 @@
               <b-form-input placeholder="Email" id="form-email" type="email" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
-          <b-form-group label="Twitter" label-for="form-twitter" label-cols-lg="2">
+          <b-form-group label-for="form-twitter" label-cols-lg="2">
             <b-input-group>
               <b-input-group-prepend is-text>
                 <b-icon icon="at"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Handle" id="form-twitter" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Twitter" id="form-twitter" :disabled="busy"></b-form-input>
             </b-input-group>
           </b-form-group>
           <div class="d-flex justify-content-center">
-            <b-button ref="submit" type="submit" :disabled="busy">Submit</b-button>
+            <b-button class="submit" ref="submit" type="submit" :disabled="busy">Submit</b-button>
           </div>
         </b-form>
 
         <!-- busy overlay -->
         <b-overlay :show="busy" no-wrap>
           <template v-slot:overlay>
-            <div v-if="processing" class="text-center p-4 bg-primary text-light rounded">
+            <div v-if="processing" class="text-center p-4 text-light bg-info">
               <b-icon icon="cloud-upload" font-scale="4"></b-icon>
               <div class="mb-3">Processing...</div>
               <b-progress
@@ -140,15 +140,6 @@ export default {
             if(this.busy) return;
 
             this.showLoginForm = !this.showLoginForm;
-
-            // TODO: get fade out to work
-            if(this.showLoginForm) {
-                this.$$refs[".register-info-box"].fadeOut();
-                this.$refs[".login-info-box"].fadeIn();
-            } else {
-                this.$refs['.register-info-box'].fadeIn();
-                this.$refs['.login-info-box'].fadeOut();
-            }
         },
         clearInterval() {
             if (this.interval) {
@@ -180,7 +171,7 @@ export default {
                 let alert = { message: "Welcome to cyberworld, " + response.data.user.username + "!", type: "success" };
                 this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
             }).catch(err => {
-                let alert = { message: err, type: "danger" };
+                let alert = { message: err, type: "danger", title: "Internal Error" };
                 this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
             }).finally(() => {
                 this.clearInterval();
@@ -212,6 +203,20 @@ a{
   text-decoration:none;
   color:#444444;
 }
+
+#label-login:hover, #label-register:hover {
+  background-color:aquamarine;
+  color: black;
+  border-color: black;
+  border-style:none !important;
+}
+
+#label-login, #label-register {
+  border-style:none !important;
+  background-color: black;
+  color: inherit;
+}
+
 .login-reg-panel{
   position: relative;
   top: 50%;
@@ -225,7 +230,7 @@ a{
 }
 .white-panel{
   background-color: rgba(255,255, 255, 1);
-  height:500px;
+  height:fit-content;
   position:absolute;
   top:-50px;
   width:50%;
@@ -243,7 +248,6 @@ a{
 }
 .login-reg-panel #label-login, 
 .login-reg-panel #label-register{
-  border:1px solid #9E9E9E;
   padding:5px 5px;
   width:150px;
   display:block;
@@ -341,5 +345,13 @@ a{
   font-weight: bold;
   letter-spacing: 1px;
   z-index: 99;
+}
+.submit:hover {
+  color: white;
+}
+
+.submit {
+  color : black;
+  background-color: white;
 }
 </style>
