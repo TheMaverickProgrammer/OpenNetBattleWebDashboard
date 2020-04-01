@@ -148,9 +148,9 @@ export default {
             }
         },
         autoLogin() {
-          this.onSubmit(true);
+          this.onSubmit(null, true);
         },
-        onSubmit(autoLogin) {
+        onSubmit(evt, autoLogin) {
             this.busy = true;
             this.counter = 1;
             this.processing = true;
