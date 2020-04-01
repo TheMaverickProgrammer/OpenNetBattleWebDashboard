@@ -7,7 +7,7 @@
       </div>
     </div>
     <div v-else>
-      <Landing/>
+      <Landing ref="landingPage"/>
     </div>
   </div>
 </template>
@@ -21,6 +21,8 @@ export default {
   components: {
     Navbar,
     Landing
+  },
+  props: {
   },
   methods: {
     makeAlert(message, type, title) {
@@ -39,6 +41,10 @@ export default {
         this.makeAlert(alert.message, alert.type, alert.title);
       }
     });
+  },
+  mounted() {
+    // try auto-logging in
+    this.$refs.landingPage.autoLogin();
   },
   beforeDestroy() {
     this.unsubscribe();
@@ -65,8 +71,8 @@ export default {
 }
 
 #app-content {
-  margin-left: 5%;
-  margin-right: 5%;
+  margin-left: 15%;
+  margin-right: 15%;
   height: 100vh;
 }
 .app-background {

@@ -3,7 +3,7 @@
         <center>
             <h1 class="title">Open Net Battle Dashboard</h1>
         </center>
-        <LoginSignupForm/>
+        <LoginSignupForm ref="form"/>
     </div>
 </template>
 
@@ -28,6 +28,9 @@ export default {
         },
         handleReset() {
             this.show = "none";
+        },
+        autoLogin() {
+            this.$refs.form.autoLogin();
         }
     },
     components: { 

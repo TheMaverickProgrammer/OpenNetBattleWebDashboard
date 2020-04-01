@@ -4,7 +4,7 @@
         @remove-cards="handleRemoveCards"
         :cards="getCardsFromFolderId($route.params.id)"/>
         <hr>
-        <b-button variant="warning" @click="handleAddCards"><b-icon-box-arrow-in-down/>Add Cards From Library</b-button>
+        <b-button variant="warning" @click="handleAddCards"><b-icon-box-arrow-in-down/>Add More Cards</b-button>
     </div>
 </template>
 

@@ -94,7 +94,7 @@
                 min="1"
                 max="20"
                 :value="counter"
-                variant="success"
+                variant="warning"
                 height="3px"
                 class="mx-n4 rounded-0"
               ></b-progress>
@@ -147,7 +147,10 @@ export default {
                 this.interval = null
             }
         },
-        onSubmit() {
+        autoLogin() {
+          this.onSubmit(true);
+        },
+        onSubmit(autoLogin) {
             this.busy = true;
             this.counter = 1;
             this.processing = true;
@@ -168,11 +171,23 @@ export default {
             .then(response => {
                 this.$store.dispatch('loginUser', response.data.user);
 
-                let alert = { message: "Welcome to cyberworld, " + response.data.user.username + "!", type: "success" };
+
+                let alert = {};
+                
+                if(autoLogin) {
+                  alert = { message: "Welcome back, " + response.data.user.username + "!", type: "success", title: "Autologin" };
+                } else {
+                  alert = { message: "Welcome to cyberworld, " + response.data.user.username + "!", type: "success" };
+                }
+
                 this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
             }).catch(err => {
-                let alert = { message: err, type: "danger", title: "Internal Error" };
-                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+                if(!autoLogin) {
+                  let alert = { message: err, type: "danger", title: "Internal Error" };
+                  this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+                }
+
+                // let auto login fail silently
             }).finally(() => {
                 this.clearInterval();
                 this.busy = this.processing = false;
@@ -248,6 +263,7 @@ a{
 }
 .login-reg-panel #label-login, 
 .login-reg-panel #label-register{
+  border:1px solid #9E9E9E;
   padding:5px 5px;
   width:150px;
   display:block;

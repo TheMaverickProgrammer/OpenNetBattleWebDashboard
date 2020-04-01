@@ -24,5 +24,7 @@ export default {
 </script>
 
 <style scoped>
-
+.element_icons {
+    margin-top:8px;
+}
 </style>

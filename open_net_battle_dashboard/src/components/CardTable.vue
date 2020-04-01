@@ -1,11 +1,6 @@
 <template>
   <div class="app-background">
-    <b-modal ref="folder-view-modal" hide-footer title="Inspect Card">
-      <div class="d-block text-center">
-        <h3>Hello From Card View Modal!</h3>
-      </div>
-      <b-button class="mt-2" variant="outline-primary" block @click="hideModal">Close</b-button>
-    </b-modal>
+    <CardInspectModal :card="inspectCard" :show="!!inspectCard"/>
 
     <b-table
       @row-selected="onRowSelected"
@@ -30,8 +25,7 @@
 
       <!-- A custom formatted column -->
       <template v-slot:cell(actions)="data" v-if="hasActions">
-        {{ data? '' : '' }}
-        <p class="h3 mb-2" @click="$emit('remove-cards', [])">
+        <p class="h3 mb-2" @click="$emit('remove-cards', [data.item])">
           <b-icon variant="danger" icon="x-circle" class="action" v-if="removable"/>
         </p>
       </template>
@@ -58,7 +52,7 @@
 
       <!-- A custom formatted column -->
       <template v-slot:cell(code)="data">
-        <b-badge variant="dark">{{ data.value }}</b-badge>
+        <CodeBadge :cardId="data.item.id"/>
       </template>
 
       <!-- A custom formatted column -->
@@ -73,12 +67,12 @@
 
       <!-- A custom formatted column -->
       <template v-slot:cell(name)="data">
-        <a href="#">{{data.value}}</a>
+        <a href="#" @click="showModal(data.item)">{{data.value}}</a>
       </template>
 
       <!-- A custom formatted column -->
       <template v-slot:cell(verboseDescription)="data">
-        <a href="#">Open in link</a> {{data?'':''}}
+        <a href="#" @click="showModal(data.item)">Open in link</a>
       </template>
 
       <!-- Example scoped slot for select state illustrative purposes -->
@@ -110,7 +104,9 @@
 
       <b-card class="selectionQueue">
         <span :key="card._id" v-for="card in selected">
-            <img :src="card.image" v-b-tooltip.hover.top="card.name + ' (' + card.code + ')'"/>
+            <a href="#" @click="showModal(card)">
+              <img :src="card.image" v-b-tooltip.hover.top="card.name + ' (' + card.code + ')'" class="queued"/>
+            </a>
         </span><br>
         <template v-slot:footer>
           <b-button @click="handleSubmit" :variant="selected.length == 0? 'outline-secondary' : 'success'" :disabled="selected.length == 0">Add To Folder</b-button>
@@ -122,10 +118,14 @@
 
 <script>
 import Element from './Element'
+import CodeBadge from './CodeBadge'
+import CardInspectModal from './CardInspectModal'
 
 export default {
     components: {
-      Element
+      Element,
+      CardInspectModal,
+      CodeBadge
     },
     props: {
       selectable: {
@@ -139,11 +139,11 @@ export default {
       cards: {
         default: new Array(),
         type: Array
-      },
+      }
     },
     computed: {
       hasActions() {
-        return this.removable; // add more as see fit
+        return this.removable; // add more conditions as see fit
       },
     },
     data() {
@@ -171,7 +171,8 @@ export default {
             isBusy: false,
             perPage: 20,
             currentPage: 1,
-            rows: 0
+            rows: 0,
+            inspectCard: null
         }
     },
     methods: {
@@ -185,11 +186,7 @@ export default {
             this.$refs.selectableTable.clearSelected()
         },
         showModal(card) {
-            this.preview = card;
-            this.$refs['card-view-modal'].show();
-        },
-        hideModal() {
-            this.$refs['card-view-modal'].hide();
+            this.inspectCard = card;
         },
         getPreview() {
             return this.preview;
@@ -203,16 +200,19 @@ export default {
 </script>
 
 <style scoped>
-.badge {
-    width:20px;
-}
-
 .action {
   margin-right: 5px;
 }
 
 .action:hover {
   cursor:pointer;
+}
+
+.queued:hover {
+  border-color:aquamarine;
+  border-width: 5px;
+  border-style:inset;
+  margin-bottom:-10px;;
 }
 
 a {
