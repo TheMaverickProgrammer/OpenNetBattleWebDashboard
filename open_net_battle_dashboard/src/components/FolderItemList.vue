@@ -1,55 +1,55 @@
 <template>
-<div>
-    <b-modal scrollable 
-            ref="folder-view-modal" 
-            :title="preview.title + ' Quick View'">
-        <div class="d-block text-center">
-            <b-list-group>
-                <b-list-group-item :key="id" v-for="id in preview.cards" class="d-flex justify-content-between align-items-center">
-                    <img :src="getCardById(id).image"/> {{ getCardById(id).name }}
-                    <CodeBadge :cardId="id"/>
-                </b-list-group-item>
-            </b-list-group>
+    <div>
+        <b-modal scrollable 
+                ref="folder-view-modal" 
+                :title="preview.title + ' Quick View'">
+            <div class="d-block text-center">
+                <b-list-group>
+                    <b-list-group-item :key="id" v-for="id in preview.cards" class="d-flex justify-content-between align-items-center">
+                        <img :src="getCardById(id).image"/> {{ getCardById(id).name }}
+                        <CodeBadge :cardId="id"/>
+                    </b-list-group-item>
+                </b-list-group>
+            </div>
+
+            <template v-slot:modal-footer="{ ok }">
+                <b-button-group>
+                    <b-button variant="outline-warning" @click="promptToShare"><b-icon icon="folder-symlink"/>Share</b-button>
+                    <b-button variant="outline-info" @click="handleEdit(getPreview)"><b-icon icon="gear"/>Edit</b-button>
+                    <b-button @click="ok">Close</b-button>
+                </b-button-group>
+            </template>
+        </b-modal>
+
+        <div class="app-background">
+            <b-container fluid class="action-panel">
+                <b-row>
+                    <b-col align-self="start" cols="2">
+                        <b-button variant="outline-success" block><b-icon icon="folder-plus"/>New</b-button>
+                    </b-col>
+                    <b-col cols="2">
+                        <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/>Delete</b-button>
+                    </b-col>
+                </b-row>
+            </b-container>
+
+            <hr>
+
+            <ul :style="gridStyle" class="folder-card-list">
+                <li v-bind:key="folder.id" v-for="folder in $store.state.folders.list">
+                    <FolderItem 
+                    checkable
+                    :id="folder.id"
+                    :title="folder.name" 
+                    :cards="folder.cards" 
+                    :date="folder.timestamp"
+                    @view-folder="showModal"
+                    @check-folder="handleCheck"
+                    @edit-folder="handleEdit"/>
+                </li>
+            </ul>
         </div>
-
-        <template v-slot:modal-footer="{ ok }">
-            <b-button-group>
-                <b-button variant="outline-warning" @click="promptToShare"><b-icon icon="folder-symlink"/>Share</b-button>
-                <b-button variant="outline-info" @click="handleEdit(getPreview)"><b-icon icon="gear"/>Edit</b-button>
-                <b-button @click="ok">Close</b-button>
-            </b-button-group>
-        </template>
-    </b-modal>
-
-    <div class="app-background">
-        <b-container fluid class="action-panel">
-            <b-row>
-                <b-col align-self="start" cols="2">
-                    <b-button variant="outline-success" block><b-icon icon="folder-plus"/>New</b-button>
-                </b-col>
-                <b-col cols="2">
-                    <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/>Delete</b-button>
-                </b-col>
-            </b-row>
-        </b-container>
-
-        <hr>
-
-        <ul :style="gridStyle" class="folder-card-list">
-            <li v-bind:key="folder.id" v-for="folder in $store.state.folders.list">
-                <FolderItem 
-                checkable
-                :id="folder.id"
-                :title="folder.name" 
-                :cards="folder.cards" 
-                :date="folder.timestamp"
-                @view-folder="showModal"
-                @check-folder="handleCheck"
-                @edit-folder="handleEdit"/>
-            </li>
-        </ul>
     </div>
-</div>
 </template>
 
 <script>

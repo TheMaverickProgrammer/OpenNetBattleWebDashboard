@@ -1,10 +1,11 @@
+<!-- Very similar to CardInspectModal except is a card component that does not show/hide -->
+
 <template>
-    <b-modal centered hide-footer
-        ref="card-view-modal"  size="sm" 
+    <b-card centered hide-footer
+        size="sm" 
         header-bg-variant="dark"
-        header-text-variant="light"
-        @hide="handleHidden">
-        <template v-slot:modal-title v-if="!!card">
+        header-text-variant="light">
+        <template v-slot:header v-if="!!card">
             {{ card.name }}&nbsp;
             <b-badge id="card-id-badge" variant="light">
                 <b-tooltip target="card-id-badge" variant="light">
@@ -20,10 +21,11 @@
             </b-row>
             <b-row class="data-row">
                 <b-col cols="2" class="left-aligned">
-                    <CodeBadge :cardId="card.id"/>
+                    <CodeBadge :cardId="card.id" v-if="!noid"/>
+                    <CodeBadge :codeFamily="card.codeFamily" :code="card.code" v-if="noid"/>
                 </b-col>
                 <b-col cols="2" class="left-aligned"> 
-                    <Element :type="card.element"/>
+                    <Element :type="card.element? card.element : 'None'"/>
                 </b-col>
                 <b-col cols="8" class="damage">
                     {{ (card.damage > 0)? card.damage : '-' }}
@@ -33,8 +35,7 @@
                 <b-textarea disabled :value="getCardDescription"/>
             </b-row>
         </b-container>
-        <b-button class="mt-2" variant="outline-danger" block @click="hideModal">Close</b-button>
-    </b-modal>
+    </b-card>
 </template>
 
 <script>
@@ -64,35 +65,15 @@ export default {
             type: Object,
             default: null
         },
-        show: {
+        noid: {
             type: Boolean,
             default: false
         }
     },
-    watch: {
-        show(next) {
-            this.$nextTick( () => {
-                if(next) this.showModal();
-                else this.hideModal();
-            });
-        }
-    },
     methods: {
-        showModal() {
-            console.log("showing modal");
-            this.$refs['card-view-modal'].show();
-        },
-        hideModal() {
-            console.log("hiding modal");
-            this.$refs['card-view-modal'].hide();
-        },
-        handleHidden() {
-            this.show = false;
-            console.log("show set to false");
-        },
         convertLineBreakToHTML(string) {
             if(!string) return string;
-            return string.replace(/\\n/g, '<br/>')
+            return string.replace(/\\n/g, '\n')
         }
     }
 }

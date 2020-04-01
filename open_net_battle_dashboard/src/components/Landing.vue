@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import LoginSignupForm from './LoginSignupForm'
+import LoginSignupForm from '@/components/forms/LoginSignupForm'
 
 export default {
     data() {

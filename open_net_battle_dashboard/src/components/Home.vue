@@ -2,34 +2,75 @@
     <div class="app-background">
         <b-button v-b-toggle.collapse-1 variant="info" class="command-panel"><b-icon-arrow90deg-down/>Command Panel</b-button>
         <b-collapse id="collapse-1" class="mt-2">
-            <b-card>
-                <div v-if="$store.state.user.isAdmin || true">
-                    <b-container>
-                        <b-row>
-                            <p class="card-text">Admin commands</p>
-                        </b-row>
-                        <b-row>
-                            <b-button variant="success">Create Card</b-button>
-                            <b-button variant="warning">Edit Card</b-button>
-                            <b-button variant="danger">Delete Card</b-button>
-                        </b-row>
-                        <b-row>
-                            <b-button variant="warning">Edit User</b-button>
-                            <b-button variant="danger">Delete User</b-button>
-                        </b-row>
-                        <b-row>
-                            <b-button variant="warning">Promote Admin</b-button>
-                            <b-button variant="danger">Delete Admin</b-button>
-                        </b-row>
-                    </b-container>
-                </div>
-            </b-card>
+            <div v-if="$store.state.user.isAdmin || true">
+                <p class="card-text">Admin commands</p>
+                <b-card-group>
+                    <b-card>
+                        <template v-slot:header>
+                            <b-icon-card-text/>Card
+                        </template>
+                        <b-button-group vertical>
+                            <b-button variant="success" @click="handleCreateCard">Create</b-button>
+                            <b-button variant="warning">Edit</b-button>
+                            <b-button variant="danger">Delete</b-button>
+                        </b-button-group>
+                    </b-card>
+                    <b-card>
+                        <template v-slot:header>
+                            <b-icon-person/>User
+                        </template>
+                        <b-button-group vertical>
+                            <b-button variant="warning">Edit</b-button>
+                            <b-button variant="danger">Delete</b-button>
+                        </b-button-group>
+                    </b-card>
+                    <b-card>
+                        <template v-slot:header>
+                            <b-icon-star/>Admin
+                        </template>
+                        <b-button-group vertical>
+                            <b-button variant="success">Promote</b-button>
+                            <b-button variant="danger">Demote</b-button>
+                        </b-button-group>
+                    </b-card>
+                </b-card-group>
+                <!-- the dynamic form based on selection above -->
+                <b-collapse id="collapse-2" class="mt-2" v-model="showProxy">
+                    <component :is="formType"/>
+                </b-collapse>
+            </div>
         </b-collapse>
     </div>
 </template>
 
 <script>
+import CardForm from '@/components/forms/CardForm'
+
 export default {
+    components: {
+        CardForm
+    },
+    props: {
+        show: {
+            type: Boolean,
+            default: false
+        },
+        formType: {
+            type: String,
+            default: "CardForm"
+        }
+    },
+    data() {
+        return {
+            showProxy: this.show
+        }
+    },
+    methods: {
+        handleCreateCard() {
+            this.formType = "CardForm";
+            this.showProxy = true;
+        }
+    }
 }
 </script>
 
