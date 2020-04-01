@@ -88,7 +88,7 @@ export default {
         },
         handleHidden() {
             this.show = false;
-            console.log("show set to false");
+            this.$emit('hidden');
         },
         convertLineBreakToHTML(string) {
             if(!string) return string;

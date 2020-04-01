@@ -1,6 +1,6 @@
 <template>
   <div class="app-background">
-    <CardInspectModal :card="inspectCard" :show="!!inspectCard"/>
+    <CardInspectModal :card="inspectCard" :show="!!inspectCard" @hidden="handleHiddenModal"/>
 
     <b-table
       @row-selected="onRowSelected"
@@ -194,6 +194,9 @@ export default {
         handleSubmit() {
             this.$emit('submit-cards', this.selected);
             this.clearSelected();
+        },
+        handleHiddenModal(){
+          this.inspectCard = null;
         }
     }
 }
