@@ -29,8 +29,9 @@
                             <b-icon-star/>Admin
                         </template>
                         <b-button-group vertical>
-                            <b-button variant="success">Promote</b-button>
-                            <b-button variant="danger">Demote</b-button>
+                            <!-- TODO: Current system cannot migrate users to admin users table... -->
+                            <b-button variant="success" disabled>Promote</b-button>
+                            <b-button variant="danger" disabled>Demote</b-button>
                         </b-button-group>
                     </b-card>
                 </b-card-group>

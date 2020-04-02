@@ -12,7 +12,7 @@
       :select-mode="selectMode"
       :items="cards"
       :fields="fields"
-      :busy="isBusy"
+      :busy="busy"
       :per-page="perPage"
       :current-page="currentPage"
     >
@@ -139,6 +139,10 @@ export default {
       cards: {
         default: new Array(),
         type: Array
+      },
+      busy: {
+        default: false,
+        type: Boolean
       }
     },
     computed: {
@@ -168,7 +172,6 @@ export default {
             fields: fields,
             selectMode: 'multi',
             selected: [],
-            isBusy: false,
             perPage: 20,
             currentPage: 1,
             rows: 0,

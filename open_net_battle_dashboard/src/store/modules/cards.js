@@ -1,3 +1,5 @@
+import api from '@/api'
+
 export const cards = {
     namespaced: true,
     state: {
@@ -5,12 +7,24 @@ export const cards = {
     },
     getters: {
         getCardById: (state) => (id) => {
-            return state.list.find( card => card.id == id) 
-                || { 
-                    name: "-", image: "", code: "-", codeFamily: [],
-                    element: "-", secondaryElement: "-", damage: 0,
-                    description: "N/A", verboseDescription: "N/A" 
-                };
+            let card = state.list.find( card => card.id == id) 
+            let nocard = { 
+                name: "-", image: "", code: "-", codeFamily: [],
+                element: "-", secondaryElement: "-", damage: 0,
+                description: "N/A", verboseDescription: "N/A" 
+            };
+
+            if(!card) {
+                // Try fetching from the api
+                api.get.card(id).then((card)=>{
+                    this.$store.dispatch('addCard', card);
+                }).catch((err) => {
+                    let alert = {message: err, type: "danger", title: "error"};
+                    this.$store.dispatch('alerts/addAlert', alert, {namespaced:true});
+                });
+            }
+
+            return nocard;
         }
     },
     mutations: {
