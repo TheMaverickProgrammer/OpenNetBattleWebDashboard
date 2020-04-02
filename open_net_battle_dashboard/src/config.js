@@ -1,6 +1,6 @@
 export default {
     domain: "battlenetwork.io",
-    port:3030,
+    port:3000,
     version: "v1",
     secured: false
 }

@@ -36,7 +36,7 @@
             </b-container>
 
             <template v-slot:footer>
-                <em>Created {{getDate}}</em>
+                <em>{{dateLabel}} {{getDate}}</em>
             </template>
 
         </b-card>
@@ -51,7 +51,7 @@ export default {
     },
     computed: {
         getSelf() {
-            return {title: this.title, cards: this.cards, date: this.date, id: this.id};
+            return {title: this.title, cards: this.cards, date: this.date, id: this.id };
         },
         getDate() {
             let dateObj = new Date(this.date);
@@ -83,6 +83,10 @@ export default {
             type: Number
         },
         date: String,
+        dateLabel: {
+            default: "Created",
+            type: String
+        },
         checked: {
             default: false,
             type: Boolean

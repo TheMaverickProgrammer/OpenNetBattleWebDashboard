@@ -13,7 +13,7 @@ export default {
         },
         codeFamily: {
             type: Array,
-            default: new Array()
+            default: () => []
         },
         code: {
             type: String,

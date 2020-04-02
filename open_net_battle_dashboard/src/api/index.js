@@ -62,7 +62,7 @@ export default {
         cardsAfterDate(milli, cancelToken) {
             return axios.get(resources.CARDS + "/since/" + milli, 
             {
-                cancelToken: cancelToken,
+                cancelToken: cancelToken || null,
                 withCredentials: true, 
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             })
@@ -70,7 +70,7 @@ export default {
         foldersAfterDate(milli, cancelToken) {
             return axios.get(resources.FOLDERS + "/since/" + milli, 
             {
-                cancelToken: cancelToken,
+                cancelToken: cancelToken || null,
                 withCredentials: true, 
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             })
@@ -78,7 +78,7 @@ export default {
         usersAfterDate(milli, cancelToken) {
             return axios.get(resources.USERS + "/since/" + milli, 
             {
-                cancelToken: cancelToken,
+                cancelToken: cancelToken || null,
                 withCredentials: true, 
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             })
@@ -86,7 +86,7 @@ export default {
         publicFoldersAfterDate(milli, cancelToken) {
             return axios.get(resources.PUBLIC_FOLDERS + "/since/" + milli, 
             {
-                cancelToken: cancelToken,
+                cancelToken: cancelToken || null,
                 withCredentials: true, 
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             })

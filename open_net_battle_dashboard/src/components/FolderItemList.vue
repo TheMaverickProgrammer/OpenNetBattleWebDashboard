@@ -2,7 +2,7 @@
     <div>
         <b-modal scrollable 
                 ref="folder-view-modal" 
-                :title="preview.title + ' Quick View'">
+                :title="'\''+ preview.title + '\' Quick View'">
             <div class="d-block text-center">
                 <b-list-group>
                     <b-list-group-item :key="id" v-for="id in preview.cards" class="d-flex justify-content-between align-items-center">
@@ -42,7 +42,8 @@
                     :id="folder.id"
                     :title="folder.name" 
                     :cards="folder.cards" 
-                    :date="folder.timestamp"
+                    :date="getRecentFolderDate(folder).time"
+                    :dateLabel="getRecentFolderDate(folder).label"
                     @view-folder="showModal"
                     @check-folder="handleCheck"
                     @edit-folder="handleEdit"/>
@@ -56,6 +57,7 @@
 import FolderItem from "./FolderItem"
 import CodeBadge from './CodeBadge'
 import axios from 'axios'
+import api from '@/api'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -83,53 +85,74 @@ export default {
         ...mapGetters('cards', ['getCardById'])
     },
     methods: {
-      handleEdit(folder) {
-        this.$router.push('/folders/'+folder.id+'/edit');
-      },
-      showModal(folder) {
-        this.preview = folder;
-        this.$refs['folder-view-modal'].show();
-      },
-      hideModal() {
-        this.$refs['folder-view-modal'].hide();
-      },
-      promptToShare() {
-        this.$bvModal.msgBoxConfirm(
-            'Are you sure to want to share this folder? There is no undo after its made public.',
-            {
-                title: 'Share this folder?',
-                okVariant: 'danger',
-                okTitle: 'YES',
-                cancelTitle: 'NO',
-                footerClass: 'p-2',
-                hideHeaderClose: false,
-                centered: true
+        getRecentFolderDate(folder) {
+            if(folder.created < folder.updated) {
+                return { time: folder.updated, label: "Updated" }
+            } else {
+                return { time: folder.created, label: "Created" }
             }
-        ).then(value => {
-            // TODO: add via API
-            if(value) {
-                this.$store.dispatch('publicFolders/addFolder', this.preview);
-            }
-        })
-        .catch(err => {
-            // An error occurred
-            const alert = { message: err, type: 'danger'};
-            this.$store.dispatch('alerts/addAlert', alert);
-        })
-      },
-      handleCheck(folder, checked) {
-          let id = folder.id;
-          let index = this.checkedList.findIndex(folderId => folderId == id);
+        },
+        handleEdit(folder) {
+            this.$router.push('/folders/'+folder.id+'/edit');
+        },
+        showModal(folder) {
+            this.preview = folder;
 
-          if(index > -1 && !checked) {
-              this.checkedList.splice(index, 1);
-          } else if(index == -1 && checked) {
-              this.checkedList = [...this.checkedList, id];
-          }
-      },
-      handleDelete() {
-          const size = this.checkedList.length;
-          if(size > 0) {
+            // Pre-fetch cards if store doesn't have it
+            this.preview.cards.forEach(id => {
+                let card = this.getCardById(id);
+
+                if(card.id || null == null) {
+                    // Try fetching from the api
+                    api.get.card(id).then(payload =>{
+                        this.$store.dispatch('cards/addCard', payload.data.data);
+                    }).catch(err => {
+                        let alert = {message: err, type: "danger", title: "error"};
+                        this.$store.dispatch('alerts/addAlert', alert, {namespaced:true});
+                    }).finally(()=>this.$refs['folder-view-modal'].show());
+                }
+            });
+        },
+        hideModal() {
+            this.$refs['folder-view-modal'].hide();
+        },
+        promptToShare() {
+            this.$bvModal.msgBoxConfirm(
+                'Are you sure to want to share this folder? There is no undo after its made public.',
+                {
+                    title: 'Share this folder?',
+                    okVariant: 'danger',
+                    okTitle: 'YES',
+                    cancelTitle: 'NO',
+                    footerClass: 'p-2',
+                    hideHeaderClose: false,
+                    centered: true
+                }
+            ).then(value => {
+                // TODO: add via API
+                if(value) {
+                    this.$store.dispatch('publicFolders/addFolder', this.preview);
+                }
+            })
+            .catch(err => {
+                // An error occurred
+                const alert = { message: err, type: 'danger'};
+                this.$store.dispatch('alerts/addAlert', alert);
+            })
+        },
+        handleCheck(folder, checked) {
+            let id = folder.id;
+            let index = this.checkedList.findIndex(folderId => folderId == id);
+
+            if(index > -1 && !checked) {
+                this.checkedList.splice(index, 1);
+            } else if(index == -1 && checked) {
+                this.checkedList = [...this.checkedList, id];
+            }
+        },
+        handleDelete() {
+            const size = this.checkedList.length;
+            if(size > 0) {
             let msg = 'Are you sure to want to delete these ' + size + ' folders? There is no undo.';
 
             if(size == 1) msg = 'Are you sure you want to delete this folder? There is no undo.';
@@ -161,8 +184,8 @@ export default {
                 const alert = { message: err, type: 'danger'};
                 this.$store.dispatch('alerts/addAlert', alert);
             })
-          }
-      }
+            }
+        }
     },
     mounted() {
         this.$store.dispatch('folders/clearFolders', { namespaced: true});
