@@ -131,7 +131,7 @@ const api =  {
             let id = cardModel.id;
             delete cardModel.id; 
         
-            return axios.post(resources.CARD_MODELS + "/" + id, 
+            return axios.put(resources.CARD_MODELS + "/" + id, 
                 cardModel,
                 {
                     withCredentials: true, 
@@ -142,7 +142,7 @@ const api =  {
             let id = user.id;
             delete user.id; 
         
-            return axios.post(resources.USERS + "/" + id, 
+            return axios.put(resources.USERS + "/" + id, 
                 user,
                 {
                     withCredentials: true, 
@@ -153,7 +153,7 @@ const api =  {
             let id = folder.id;
             delete folder.id; 
         
-            return axios.post(resources.FOLDERS + "/" + id, 
+            return axios.put(resources.FOLDERS + "/" + id, 
                 folder,
                 {
                     withCredentials: true, 
@@ -164,7 +164,7 @@ const api =  {
             let id = folder.id;
             delete folder.id; 
         
-            return axios.post(resources.PUBLIC_FOLDERS +"/" + id, 
+            return axios.put(resources.PUBLIC_FOLDERS +"/" + id, 
                 folder,
                 {
                     withCredentials: true, 

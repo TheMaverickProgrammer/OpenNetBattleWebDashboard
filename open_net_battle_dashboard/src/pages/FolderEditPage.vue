@@ -72,14 +72,13 @@ export default {
                 })
                 .catch(err => {
                     // An error occurred
-                    const alert = { message: err, type: 'danger'};
+                    const alert = { message: err, type: 'danger', title: "Internal Error"};
                     this.$store.dispatch('alerts/addAlert', alert);
                 })
             }
         }
     }, 
     mounted() {
-        console.log("fetching");
         let folderId = this.$route.params.id;
         this.$api.prefetchFolderById(folderId, folder=>{
             console.log(folderId, folder)
@@ -88,10 +87,7 @@ export default {
                     this.cards = [...this.cards,card];
                  });
             }
-            console.log("what")
         });
-
-        console.log("hello?")
     }
 }
 </script>

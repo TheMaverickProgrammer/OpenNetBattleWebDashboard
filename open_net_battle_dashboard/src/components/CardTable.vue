@@ -107,7 +107,11 @@
             <a href="#" @click="showModal(card)">
               <img :src="card.image" v-b-tooltip.hover.top="card.name + ' (' + card.code + ')'" class="queued"/>
             </a>
-        </span><br>
+        </span>
+        <span v-if="selected.length==0">
+          &lt; no selection &gt;
+        </span>
+        <br>
         <template v-slot:footer>
           <b-button @click="handleSubmit" :variant="selected.length == 0? 'outline-secondary' : 'success'" :disabled="selected.length == 0">Add To Folder</b-button>
         </template>

@@ -8,17 +8,17 @@
             <template v-slot:header>
                 <b-container style="text-align:left;">
                     <b-row>
-                        <b-col cols="1" v-if="checkable">
+                        <b-col cols="0" v-if="checkable">
                             <b-check :checked="getChecked" @change="onCheck"/>
                         </b-col>
-                        <b-col>
+                        <b-col cols="5">
                             <b-card-text>
                                 {{ title }}
                             </b-card-text>
                         </b-col>
                         <b-col cols="5">
                             <b-card-text>
-                                {{ cards.length }} / {{ maxCardSize }} cards
+                                {{ cards.length }}/{{ maxCardSize }}
                             </b-card-text>
                         </b-col>
                     </b-row>
