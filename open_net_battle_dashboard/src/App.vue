@@ -3,7 +3,11 @@
     <div v-if="$store.state.user.username != ''">
       <div id="app-content"> 
         <Navbar :user="$store.state.user.username"/>
-        <router-view/>
+        <transition name="fade" mode="out-in">    
+          <keep-alive :include="keepAliveList">    
+            <router-view/>
+          </keep-alive>
+        </transition>>
       </div>
     </div>
     <div v-else>
@@ -14,7 +18,7 @@
 
 <script>
 import Navbar from '@/components/Navbar';
-import Landing from '@/components/Landing';
+import Landing from '@/pages/Landing';
 
 export default {
   name: 'App',
@@ -23,6 +27,11 @@ export default {
     Landing
   },
   props: {
+  },
+  data() {
+    return {
+      keepAliveList: ['FolderListPage','CardLibraryViewPage']
+    }
   },
   methods: {
     makeAlert(message, type, title) {

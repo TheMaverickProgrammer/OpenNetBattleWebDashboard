@@ -38,8 +38,8 @@
 </template>
 
 <script>
-import Element from './Element'
-import CodeBadge from './CodeBadge'
+import Element from '@/components/Element'
+import CodeBadge from '@/components/CodeBadge'
 
 export default {
     components: {
@@ -79,11 +79,9 @@ export default {
     },
     methods: {
         showModal() {
-            console.log("showing modal");
             this.$refs['card-view-modal'].show();
         },
         hideModal() {
-            console.log("hiding modal");
             this.$refs['card-view-modal'].hide();
         },
         handleHidden() {

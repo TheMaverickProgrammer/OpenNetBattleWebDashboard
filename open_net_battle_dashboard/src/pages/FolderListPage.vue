@@ -1,8 +1,21 @@
 <template>
     <div>
+        <!-- modals -->
+        <b-modal ref="folder-create-modal"
+            title="Create New Folder"
+            :busy="busy">
+            <b-form @submit.stop.prevent="handleFolderCreate">
+                <b-form-input placeholder="Name" required v-model="newFolderName"/>
+                <b-button-group>
+                    <b-button variant="outline-success" type="submit"><b-icon-folder-check/>Create</b-button>
+                    <b-button>Cancel</b-button>
+                </b-button-group>
+            </b-form>
+        </b-modal>
+
         <b-modal scrollable 
-                ref="folder-view-modal" 
-                :title="'\''+ preview.title + '\' Quick View'">
+            ref="folder-view-modal" 
+            :title="'\''+ preview.title + '\' Quick View'">
             <div class="d-block text-center">
                 <b-list-group>
                     <b-list-group-item :key="id" v-for="id in preview.cards" class="d-flex justify-content-between align-items-center">
@@ -12,20 +25,20 @@
                 </b-list-group>
             </div>
 
-            <template v-slot:modal-footer="{ ok }">
+            <template v-slot:modal-footer>
                 <b-button-group>
                     <b-button variant="outline-warning" @click="promptToShare"><b-icon icon="folder-symlink"/>Share</b-button>
                     <b-button variant="outline-info" @click="handleEdit(getPreview)"><b-icon icon="gear"/>Edit</b-button>
-                    <b-button @click="ok">Close</b-button>
                 </b-button-group>
             </template>
         </b-modal>
 
+        <!-- app contents begin -->
         <div class="app-background">
             <b-container fluid class="action-panel">
                 <b-row>
                     <b-col align-self="start" cols="2">
-                        <b-button variant="outline-success" block><b-icon icon="folder-plus"/>New</b-button>
+                        <b-button variant="outline-success" block @click="showCreateFolderModal"><b-icon icon="folder-plus"/>New</b-button>
                     </b-col>
                     <b-col cols="2">
                         <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/>Delete</b-button>
@@ -44,7 +57,7 @@
                     :cards="folder.cards" 
                     :date="getRecentFolderDate(folder).time"
                     :dateLabel="getRecentFolderDate(folder).label"
-                    @view-folder="showModal"
+                    @view-folder="showQuickViewModal"
                     @check-folder="handleCheck"
                     @edit-folder="handleEdit"/>
                 </li>
@@ -54,19 +67,20 @@
 </template>
 
 <script>
-import FolderItem from "./FolderItem"
-import CodeBadge from './CodeBadge'
-import axios from 'axios'
-import api from '@/api'
+import FolderItem from "@/components/FolderItem"
+import CodeBadge from '@/components/CodeBadge'
 import { mapGetters } from 'vuex'
 
 export default {
-    name: "FolderItemList",
+    name: "FolderListPage",
     data() {
         return {
             preview: { name: "", cards: [], timestamp: "" },
+            newFolderName: "",
             numberOfColumns: 3,
-            checkedList: []
+            checkedList: [],
+            busy: false,
+            lastUpdated: 0
         }
     },
     components: {
@@ -86,7 +100,7 @@ export default {
     },
     methods: {
         getRecentFolderDate(folder) {
-            if(folder.created < folder.updated) {
+            if((new Date(folder.created)).getTime()+1000 < (new Date(folder.updated)).getTime()) {
                 return { time: folder.updated, label: "Updated" }
             } else {
                 return { time: folder.created, label: "Created" }
@@ -95,26 +109,24 @@ export default {
         handleEdit(folder) {
             this.$router.push('/folders/'+folder.id+'/edit');
         },
-        showModal(folder) {
+        showQuickViewModal(folder) {
             this.preview = folder;
 
             // Pre-fetch cards if store doesn't have it
             this.preview.cards.forEach(id => {
-                let card = this.getCardById(id);
-
-                if(card.id || null == null) {
-                    // Try fetching from the api
-                    api.get.card(id).then(payload =>{
-                        this.$store.dispatch('cards/addCard', payload.data.data);
-                    }).catch(err => {
-                        let alert = {message: err, type: "danger", title: "error"};
-                        this.$store.dispatch('alerts/addAlert', alert, {namespaced:true});
-                    }).finally(()=>this.$refs['folder-view-modal'].show());
-                }
+                this.$api.prefetchCardById(id);
             });
+
+            this.$refs['folder-view-modal'].show()
         },
-        hideModal() {
+        hideQuickViewModal() {
             this.$refs['folder-view-modal'].hide();
+        },
+        showCreateFolderModal() {
+            this.$refs['folder-create-modal'].show()
+        },
+        hideCreateFolderModal() {
+            this.$refs['folder-create-modal'].hide();
         },
         promptToShare() {
             this.$bvModal.msgBoxConfirm(
@@ -153,50 +165,64 @@ export default {
         handleDelete() {
             const size = this.checkedList.length;
             if(size > 0) {
-            let msg = 'Are you sure to want to delete these ' + size + ' folders? There is no undo.';
+                let msg = 'Are you sure to want to delete these ' + size + ' folders? There is no undo.';
 
-            if(size == 1) msg = 'Are you sure you want to delete this folder? There is no undo.';
+                if(size == 1) msg = 'Are you sure you want to delete this folder? There is no undo.';
 
-            this.$bvModal.msgBoxConfirm(
-                msg,
-                {
-                    title: 'Are you sure?',
-                    okVariant: 'danger',
-                    okTitle: 'YES',
-                    cancelTitle: 'NO',
-                    footerClass: 'p-2',
-                    hideHeaderClose: false,
-                    centered: true
-                }
-            ).then(value => {
-                // TODO: delete via API
-
-                if(value) {
-                    this.checkedList.forEach((id) => {
-                        console.log(id);
-                        this.$store.dispatch('folders/removeFolder', id);
-                    });
-                    this.checkedList = [];
-                }
-            })
-            .catch(err => {
-                // An error occurred
-                const alert = { message: err, type: 'danger'};
-                this.$store.dispatch('alerts/addAlert', alert);
-            })
+                this.$bvModal.msgBoxConfirm(
+                    msg,
+                    {
+                        title: 'Are you sure?',
+                        okVariant: 'danger',
+                        okTitle: 'YES',
+                        cancelTitle: 'NO',
+                        footerClass: 'p-2',
+                        hideHeaderClose: false,
+                        centered: true
+                    }
+                ).then(value => {
+                    if(value) {
+                        this.checkedList.forEach((id) => {
+                            this.$api.delete.folder(id).then(payload=>{
+                                this.$store.dispatch('folders/removeFolder', id);
+                                const alert = { message: payload.data.data.message, type: 'info'};
+                                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                            }).catch(err=>{
+                                // An error occurred
+                                // We want to catch individual errors here so the loop is uninterrupted
+                                const alert = { message: err.response.data.error, type: 'danger', title: 'Error Deleting'};
+                                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                            }).finally(()=>{
+                                this.checkedList = [];
+                            });
+                        });
+                    }
+                })
+                .catch(err => {
+                    // An error occurred
+                    const alert = { message: err, type: 'danger', title: 'Internal Error'};
+                    this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                })
             }
+        },
+        handleFolderCreate() {
+            this.busy = true;
+
+            this.$api.add.folder({name: this.newFolderName}).then(payload=>{
+                this.$store.dispatch('folders/addFolder', payload.data.data, {namespaced: true})
+                this.hideCreateFolderModal();
+                const alert = { message: "New Folder '" + payload.data.data.name + "' added!", type: 'success'};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+            }).catch(err=>{
+                // An error occurred
+                const alert = { message: err.response.data.error, type: 'danger', title:'Could Not Create'};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+            }).finally(()=>{ this.busy = false; });
         }
     },
-    mounted() {
-        this.$store.dispatch('folders/clearFolders', { namespaced: true});
-
-        // Simulate an async request
-        axios.get('http://battlenetwork.io:3000/v1/folders', 
-            {
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                withCredentials: true
-            }, 
-        )
+    activated() {
+        // Refresh folders
+        this.$api.get.foldersAfterDate(this.lastUpdated)
         .then(response => {
             let payload = response.data;
             
@@ -206,6 +232,8 @@ export default {
         }).catch(err => {
             let alert = { message: err, type: "danger", title: "Internal Error" };
             this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+        }).finally(()=>{
+            this.lastUpdated = Date.now();
         });
     }
 }

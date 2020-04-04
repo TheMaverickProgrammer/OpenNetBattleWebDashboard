@@ -29,12 +29,12 @@
 </template>
 
 <script>
-import FolderItem from "./FolderItem";
+import FolderItem from "@/components/FolderItem";
 // import axios from 'axios'
 import { mapGetters } from 'vuex'
 
 export default {
-    name: "PublicFolderItemList",
+    name: "PublicFolderListPage",
     data() {
         return {
             preview: { name: "", cards: [], timestamp: "" },

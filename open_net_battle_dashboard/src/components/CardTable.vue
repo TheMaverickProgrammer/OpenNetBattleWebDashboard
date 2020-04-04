@@ -26,7 +26,7 @@
       <!-- A custom formatted column -->
       <template v-slot:cell(actions)="data" v-if="hasActions">
         <p class="h3 mb-2" @click="$emit('remove-cards', [data.item])">
-          <b-icon variant="danger" icon="x-circle" class="action" v-if="removable"/>
+          <b-icon variant="danger" icon="x-circle" class="action" v-if="removable" v-b-tooltip.hover.top="'Remove card'"/>
         </p>
       </template>
 

@@ -1,11 +1,12 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import Home from '@/components/Home'
-import FolderItemList from '@/components/FolderItemList'
-import FolderEditPage from '@/components/FolderEditPage'
-import FolderAddFromLibraryPage from '@/components/FolderAddFromLibraryPage'
-import PublicFolderItemList from '@/components/PublicFolderItemList'
-import CardLibraryViewPage from '@/components/CardLibraryViewPage'
+import Home from '@/pages/Home'
+import FolderListPage from '@/pages/FolderListPage'
+import FolderEditPage from '@/pages/FolderEditPage'
+import FolderAddFromLibraryPage from '@/pages/FolderAddFromLibraryPage'
+import PublicFolderListPage from '@/pages/PublicFolderListPage'
+import CardLibraryViewPage from '@/pages/CardLibraryViewPage'
+import CodeEditPage from '@/pages/CodeEditPage'
 
 Vue.use(Router)
 
@@ -24,7 +25,7 @@ export default new Router({
     {
         path: '/folders',
         name: 'FolderListPage',
-        component: FolderItemList,
+        component: FolderListPage,
         meta: {
             breadcrumb: [
                 { name: 'Home', link: '/'},
@@ -69,9 +70,21 @@ export default new Router({
         }
     },
     {
+        path: '/cards/:id/edit/script',
+        name: 'CodeEditPage',
+        component: CodeEditPage, 
+        meta: {
+            breadcrumb: [
+                { name: 'Home', link: '/'},
+                { name: 'Edit Card'},
+                { name: 'Scripting'}
+            ]
+        }
+    },
+    {
         path: '/public-folders',
         name: 'PublicFolderListPage',
-        component: PublicFolderItemList,
+        component: PublicFolderListPage,
         meta: {
         breadcrumb: [
             { name: 'Home', link: '/'},

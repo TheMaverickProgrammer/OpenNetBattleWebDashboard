@@ -27,7 +27,7 @@
             <b-container class="bv-example-row">
             <b-row>
                 <b-col>
-                    <b-button href="#" variant="primary" @click="$emit('view-folder', getSelf)">Quick View</b-button>
+                    <b-button href="#" variant="primary" @click="$emit('view-folder', getSelf)" :disabled="cards.length==0">Quick View</b-button>
                 </b-col>
                 <b-col>
                     <b-button href="#" variant="outline-primary" @click="$emit('edit-folder', getSelf)">Edit</b-button>

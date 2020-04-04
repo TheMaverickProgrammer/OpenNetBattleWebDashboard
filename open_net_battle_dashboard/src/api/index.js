@@ -13,10 +13,9 @@ const resources = {
     FOLDERS: base_url + "/folders",
     PUBLIC_FOLDERS: base_url + '/public-folders',
     CARD_MODELS: base_url + '/card-mdodels',
-
 }
 
-export default {
+const api =  {
     login(username, password, cancelToken) {
         return axios.get(resources.LOGIN, 
         {
@@ -43,17 +42,24 @@ export default {
     get: {
         card(id) {
             return axios.get(resources.CARDS + "/" + id, 
-            {
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         cardModel(id) {
             return axios.get(resources.CARD_MODELS + "/" + id, 
-            {
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
+        },
+        folder(id) {
+            return axios.get(resources.FOLDERS + "/" + id, 
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         /* 
         API uses time to fetch real-time updates
@@ -61,61 +67,61 @@ export default {
         */
         cardsAfterDate(milli, cancelToken) {
             return axios.get(resources.CARDS + "/since/" + milli, 
-            {
-                cancelToken: cancelToken || null,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                {
+                    cancelToken: cancelToken || null,
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         foldersAfterDate(milli, cancelToken) {
             return axios.get(resources.FOLDERS + "/since/" + milli, 
-            {
-                cancelToken: cancelToken || null,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                {
+                    cancelToken: cancelToken || null,
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         usersAfterDate(milli, cancelToken) {
             return axios.get(resources.USERS + "/since/" + milli, 
-            {
-                cancelToken: cancelToken || null,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                {
+                    cancelToken: cancelToken || null,
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         publicFoldersAfterDate(milli, cancelToken) {
             return axios.get(resources.PUBLIC_FOLDERS + "/since/" + milli, 
-            {
-                cancelToken: cancelToken || null,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                {
+                    cancelToken: cancelToken || null,
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         }
     },
     add: {
         cardModel(cardModel) {
             return axios.post(resources.CARD_MODELS, 
-            {
-                data: cardModel,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                cardModel,
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         folder(folder) {
             return axios.post(resources.FOLDERS, 
-            {
-                data: folder,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                folder,
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/json' },
+                })
         },
         publicFolder(folder) {
             return axios.post(resources.PUBLIC_FOLDERS, 
-            {
-                data: folder,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                folder,
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         }
     },
     update: {
@@ -126,44 +132,44 @@ export default {
             delete cardModel.id; 
         
             return axios.post(resources.CARD_MODELS + "/" + id, 
-            {
-                data: cardModel,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                cardModel,
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         user(user) {
             let id = user.id;
             delete user.id; 
         
             return axios.post(resources.USERS + "/" + id, 
-            {
-                data: user,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                user,
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         folder(folder) {
             let id = folder.id;
             delete folder.id; 
         
             return axios.post(resources.FOLDERS + "/" + id, 
-            {
-                data: folder,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                folder,
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         },
         publicFolder(folder) {
             let id = folder.id;
             delete folder.id; 
         
             return axios.post(resources.PUBLIC_FOLDERS +"/" + id, 
-            {
-                data: folder,
-                withCredentials: true, 
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            })
+                folder,
+                {
+                    withCredentials: true, 
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                })
         }
     },
     delete: {
@@ -197,3 +203,64 @@ export default {
         }
     }
 }
+
+const plugin = {
+    install(Vue, options) {
+        if (!options || !options.store) {
+            throw new Error('Please initialise plugin with a Vuex store.');
+        }
+
+        let store = options.store;
+        Vue.api = api;
+        Vue.prototype.$api = api;
+
+        Vue.prototype.$api.prefetchCardById = function(id, onComplete) {
+            onComplete = onComplete || function(){};
+
+            let getCardById = store.getters['cards/getCardById'];
+            let card = getCardById(id);
+
+            if((card.id || null) == null) {
+                // Try fetching from the api
+                api.get.card(id).then(payload =>{
+                    store.dispatch('cards/addCard', payload.data.data);
+                    card = getCardById(id);
+                }).catch(err => {
+                    let alert = {message: err, type: "danger", title: "error"};
+                    store.dispatch('alerts/addAlert', alert, {namespaced:true});
+                }).finally(()=>{onComplete(card)});
+            } else {
+                // we have it
+                onComplete(card)
+            }
+
+            //return card; // make synchronous?
+        },
+
+        Vue.prototype.$api.prefetchFolderById = function(id, onComplete) {
+            onComplete = onComplete || function(){};
+
+            let getFolderById = store.getters['folders/getFolderById'];
+            let folder = getFolderById(id);
+
+
+            if(typeof folder.id  === 'undefined') {
+                // Try fetching from the api
+                api.get.folder(id).then(payload =>{
+                    store.dispatch('folders/addFolder', payload.data.data);
+                    folder = getFolderById(id);
+                }).catch(err => {
+                    let alert = {message: err, type: "danger", title: "error"};
+                    store.dispatch('alerts/addAlert', alert, {namespaced:true});
+                }).finally(()=>{console.log("finally"); onComplete(folder)});
+            } else {
+                // we have it
+                onComplete(folder);
+            }
+
+            //return folder; // make synchronous?
+        }
+    }
+}
+
+export default plugin;

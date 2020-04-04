@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import CardTable from './CardTable'
+import CardTable from '@/components/CardTable'
 
 export default {
     components: {

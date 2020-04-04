@@ -19,20 +19,26 @@ export const cards = {
     },
     mutations: {
         doAddCard(state, card) {
-            card.id = card._id;
-            card.name = card.detail.name;
-            card.codeFamily = card.detail.codes;
-            card.image = card.detail.image;
-            card.icon = card.detail.icon;
-            card.element = card.detail.element;
-            card.secondaryElement = card.detail.secondaryElement;
-            card.damage = card.detail.damage;
-            card.modelId = card.detail._id;
-            card.description = card.detail.description;
-            card.verboseDescription = card.detail.verboseDescription;
-            delete card._id;
-            delete card.detail;
-            state.list = [card, ...state.list];
+            if(typeof card.id === 'undefined' && card._id) {
+                card.id = card._id;
+                delete card._id;
+            }
+
+            // Don't track duplicates
+            if(!state.list.find( cardItem => cardItem.id == card.id)) {
+                card.name = card.detail.name;
+                card.codeFamily = card.detail.codes;
+                card.image = card.detail.image;
+                card.icon = card.detail.icon;
+                card.element = card.detail.element;
+                card.secondaryElement = card.detail.secondaryElement;
+                card.damage = card.detail.damage;
+                card.modelId = card.detail._id;
+                card.description = card.detail.description;
+                card.verboseDescription = card.detail.verboseDescription;
+                delete card.detail;
+                state.list = [card, ...state.list];
+            }
         },
         doRemoveCard(state, cardIndex) {
             state.list.splice(cardIndex, 1);

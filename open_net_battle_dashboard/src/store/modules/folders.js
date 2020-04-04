@@ -11,8 +11,11 @@ export const folders = {
     },
     mutations: {
         doAddFolder(state, folder) {
-            folder.id = folder._id;
-            delete folder._id;
+            if(typeof folder.id === 'undefined' && folder._id) {
+                folder.id = folder._id;
+                delete folder._id;
+            }
+
             state.list = [folder, ...state.list];
         },
         doRemoveFolder(state, id) {
@@ -24,6 +27,18 @@ export const folders = {
         },
         doClearFolders(state) {
             state.list = []
+        },
+        doUpdateFolder(state, folder) {
+            if(typeof folder.id === 'undefined' && folder._id) {
+                folder.id = folder._id;
+                delete folder._id;
+            }
+
+            let index = state.list.findIndex(folderItem => folderItem.id == folder.id);
+
+            if(index > -1) {
+               state.list[index] = folder;
+            }
         }
     },
     actions: {
@@ -35,6 +50,9 @@ export const folders = {
         },
         clearFolders(context) {
             context.commit('doClearFolders');
+        },
+        updateFolder(context, folder) {
+            context.commit('doUpdateFolder', folder);
         }
     }
 }

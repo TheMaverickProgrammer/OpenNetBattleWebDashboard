@@ -2,39 +2,36 @@
     <div>
         <CardTable removable 
         @remove-cards="handleRemoveCards"
-        :cards="getCardsFromFolderId($route.params.id)"/>
-        <hr>
-        <b-button variant="warning" @click="handleAddCards"><b-icon-box-arrow-in-down/>Add More Cards</b-button>
+        :cards="getCards"/>
+        <b-card>
+            <b-button variant="warning" @click="handleAddCardsFromLibrary"><b-icon-box-arrow-in-down/>Add More Cards</b-button>
+        </b-card>
     </div>
 </template>
 
 <script>
-import CardTable from './CardTable'
+import CardTable from '@/components/CardTable'
 import { mapGetters } from 'vuex'
 
 export default {
+    name: "FolderEditPage",
     components: {
         CardTable
+    },
+    data() {
+        return {
+            cards: []
+        }
     },
     computed: {
         ...mapGetters('folders', ['getFolderById']),
         ...mapGetters('cards', ['getCardById']),
-        getCardsFromFolderId()  {
-            let self = this;
-            return (folderId) => {
-                let folder = self.getFolderById(folderId);
-                let cards = [];
-
-                folder.cards.forEach(element => {
-                    cards = [self.getCardById(element), ...cards];
-                });
-
-                return cards;
-            }
+        getCards() {
+            return this.cards
         }
     },
     methods: {
-        handleAddCards() {
+        handleAddCardsFromLibrary() {
             this.$router.push('add-cards-from-library');
         },
         handleRemoveCards(cards) {
@@ -56,10 +53,21 @@ export default {
                         centered: true
                     }
                 ).then(value => {
-                    // TODO: delete via API
-
                     if(value) {
                         // set folder to new cards
+                        let folderId = this.$route.params.id;
+                        let folder = this.getFolderById(folderId);
+                        let cardIdsOnly = [];
+
+                        cards.forEach(card=> {
+                            cardIdsOnly = [...cardIdsOnly, card.id];
+                        });
+
+                        folder.cards.remove(cardIdsOnly);
+
+                        this.$api.update.folder(folder).then(payload => {
+                            this.$store.dispatch('folders/updateFolder', payload.data.data);
+                        }); // outer catch will catch any errors
                     }
                 })
                 .catch(err => {
@@ -69,6 +77,21 @@ export default {
                 })
             }
         }
+    }, 
+    mounted() {
+        console.log("fetching");
+        let folderId = this.$route.params.id;
+        this.$api.prefetchFolderById(folderId, folder=>{
+            console.log(folderId, folder)
+            for(let id of folder.cards) {
+                 this.$api.prefetchCardById(id, card=>{
+                    this.cards = [...this.cards,card];
+                 });
+            }
+            console.log("what")
+        });
+
+        console.log("hello?")
     }
 }
 </script>
