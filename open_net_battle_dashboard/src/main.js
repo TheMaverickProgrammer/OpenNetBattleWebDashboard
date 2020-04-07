@@ -38,25 +38,6 @@ Vanilla js and css imports
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
-// Add mutli-element remove function to array
-Array.prototype.remove = function(){
-  let args = Array.apply(null, arguments);
-  let indices = [];
-  for(let i = 0; i < args.length; i++){
-      let arg = args[i];
-      let index = this.indexOf(arg);
-      while(index > -1){
-          indices.push(index);
-          index = this.indexOf(arg, index + 1);
-      }
-  }
-  indices.sort();
-  for(let i = 0; i < indices.length; i++){
-      let index = indices[i] - i;
-      this.splice(index, 1);
-  }    
-}
-
 /* eslint-disable no-new */
 Vue.config.productionTip = false
 

@@ -42,17 +42,17 @@ export default {
             });
 
             let folderSize = folder.cards.length;
-            folder.cards = [...folder.cards, ...cardIdsOnly];
+            let newFolder = { cards: [...folder.cards, ...cardIdsOnly], id: folder.id };
 
-            this.$api.update.folder(folder).then(payload => {
-                console.log(payload);
-                //this.$store.dispatch('folders/updateFolder', payload.data.data);
+            this.$api.update.folder(newFolder).then(payload => {
+                this.$store.dispatch('folders/updateFolder', payload.data.data);
                 
-                const alert = { message:  String(payload.data.data.cards.length - folderSize) + " cards added!", type: 'success', title:"Complete"};
+                let count = payload.data.data.cards.length - folderSize;
+                const alert = { message:  String(count) + " cards added!", type: count==0?'warning':'success', title:"Complete"};
                 this.$store.dispatch('alerts/addAlert', alert);
             }).catch(err=>{
                 // An error occurred
-                const alert = { message: err, type: 'danger', title:"Internal Error"};
+                const alert = { message: err.response.error, type: 'danger', title:"Internal Error"};
                 this.$store.dispatch('alerts/addAlert', alert);
             });
         },

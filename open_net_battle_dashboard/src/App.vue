@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      keepAliveList: ['FolderListPage','CardLibraryViewPage', 'FolderAddFromLibraryPage']
+      keepAliveList: ['FolderListPage','PublicFolderListPage','CardLibraryViewPage', 'FolderAddFromLibraryPage']
     }
   },
   methods: {

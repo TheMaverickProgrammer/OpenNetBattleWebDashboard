@@ -49,7 +49,7 @@
             <hr>
 
             <ul :style="gridStyle" class="folder-card-list">
-                <li v-bind:key="folder.id" v-for="folder in $store.state.folders.list">
+                <li v-bind:key="folder.id" v-for="folder in getFolders">
                     <FolderItem 
                     checkable
                     :id="folder.id"
@@ -96,7 +96,11 @@ export default {
         getPreview() {
             return this.preview;
         },
-        ...mapGetters('cards', ['getCardById'])
+        getFolders() {
+            return this.$store.state.folders.list;
+        },
+        ...mapGetters('cards', ['getCardById']),
+        ...mapGetters('folders',['doesFolderExistById'])
     },
     methods: {
         getRecentFolderDate(folder) {
@@ -141,9 +145,17 @@ export default {
                     centered: true
                 }
             ).then(value => {
-                // TODO: add via API
                 if(value) {
-                    this.$store.dispatch('publicFolders/addFolder', this.preview);
+                    let newFolder = {...this.preview};
+                    newFolder.name = newFolder.title;
+                    delete newFolder.title; 
+                    delete newFolder.id;
+
+                    this.$api.add.publicFolder(newFolder).then((response) => {
+                        let payload = response.data;
+                        let folder = payload.data;
+                        this.$store.dispatch('publicFolders/addFolder', folder);
+                    }); // let other errors bubble up to the outer catch
                 }
             })
             .catch(err => {
@@ -220,14 +232,17 @@ export default {
             }).finally(()=>{ this.busy = false; });
         }
     },
-    activated() {
+    activated() {        
         // Refresh folders
         this.$api.get.foldersAfterDate(this.lastUpdated)
         .then(response => {
             let payload = response.data;
             
             payload.data.forEach( element => {
-                this.$store.dispatch('folders/addFolder', element, { namespaced: true});
+                if(this.doesFolderExistById(element._id))
+                    this.$store.dispatch('folders/updateFolder', element, { namespaced: true});
+                else
+                    this.$store.dispatch('folders/addFolder', element, { namespaced: true});
             });
         }).catch(err => {
             let alert = { message: err, type: "danger", title: "Internal Error" };

@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 export const folders = {
     namespaced: true,
     state: {
@@ -7,6 +9,11 @@ export const folders = {
         getFolderById: (state) => (id) => {
             return state.list.find( folder => folder.id == id) 
                 || { name: "", cards: [], date: 0 };
+        },
+        doesFolderExistById: (state) => (id) => {
+            let index = state.list.findIndex(folderItem => folderItem.id == id);
+
+            return (index > -1);
         }
     },
     mutations: {
@@ -37,7 +44,7 @@ export const folders = {
             let index = state.list.findIndex(folderItem => folderItem.id == folder.id);
 
             if(index > -1) {
-               state.list[index] = folder;
+               Vue.set(state.list, index, folder);
             }
         }
     },

@@ -2,7 +2,7 @@
     <div>
         <CardTable removable 
         @remove-cards="handleRemoveCards"
-        :cards="getCards"/>
+        :cards="cards"/>
         <b-card>
             <b-button variant="warning" @click="handleAddCardsFromLibrary"><b-icon-box-arrow-in-down/>Add More Cards</b-button>
         </b-card>
@@ -26,11 +26,25 @@ export default {
     computed: {
         ...mapGetters('folders', ['getFolderById']),
         ...mapGetters('cards', ['getCardById']),
-        getCards() {
-            return this.cards
-        }
     },
     methods: {
+        fetchCards() {
+            this.cards = [];
+            // current cards in store
+            let folderId = this.$route.params.id;
+            let folder = this.getFolderById(folderId);
+
+            if(typeof folder.id === 'undefined')
+                throw new Error("Folder data missing for this folder!");
+
+            this.$api.prefetchFolderById(folderId, folder=>{
+                for(let id of folder.cards) {
+                    this.$api.prefetchCardById(id, card=>{
+                        this.cards = [...this.cards, card];
+                    });
+                }
+            });
+        },
         handleAddCardsFromLibrary() {
             this.$router.push('add-cards-from-library');
         },
@@ -52,22 +66,29 @@ export default {
                         hideHeaderClose: false,
                         centered: true
                     }
-                ).then(value => {
+                ).then(async value => {
                     if(value) {
                         // set folder to new cards
                         let folderId = this.$route.params.id;
                         let folder = this.getFolderById(folderId);
+
+                        if(typeof folder.id === 'undefined')
+                            throw new Error("Folder data missing for this folder!");
+
                         let cardIdsOnly = [];
 
                         cards.forEach(card=> {
                             cardIdsOnly = [...cardIdsOnly, card.id];
                         });
 
-                        folder.cards.remove(cardIdsOnly);
+                        cardIdsOnly.forEach(x => folder.cards.splice(folder.cards.indexOf(x), 1));
 
-                        this.$api.update.folder(folder).then(payload => {
-                            this.$store.dispatch('folders/updateFolder', payload.data.data);
-                        }); // outer catch will catch any errors
+                        let payload = await this.$api.update.folder(folder);
+                        let newFolder = payload.data.data;
+                        this.$store.dispatch('folders/updateFolder', newFolder);
+                        this.fetchCards();
+
+                        // outer catch will catch any errors
                     }
                 })
                 .catch(err => {
@@ -79,15 +100,7 @@ export default {
         }
     }, 
     mounted() {
-        let folderId = this.$route.params.id;
-        this.$api.prefetchFolderById(folderId, folder=>{
-            console.log(folderId, folder)
-            for(let id of folder.cards) {
-                 this.$api.prefetchCardById(id, card=>{
-                    this.cards = [...this.cards,card];
-                 });
-            }
-        });
+        this.fetchCards();
     }
 }
 </script>
