@@ -2,21 +2,21 @@
     <div>
         <!-- popup modal -->
         <b-modal scrollable 
-                ref="folder-view-modal" 
-                :title="preview.title + ' Quick View'">
+            ref="folder-view-modal" 
+            :title="'\''+ preview.title + '\' Quick View'">
             <div class="d-block text-center">
                 <b-list-group>
                     <b-list-group-item :key="id" v-for="id in preview.cards" class="d-flex justify-content-between align-items-center">
                         <img :src="getCardById(id).image"/> {{ getCardById(id).name }}
-                        <b-badge variant="dark" v-b-tooltip.hover.right="'Code family: ' + getCardById(id).codeFamily.join(',')">{{ getCardById(id).code }}</b-badge>
+                        <CodeBadge :cardId="id"/>
                     </b-list-group-item>
                 </b-list-group>
             </div>
 
-            <template v-slot:modal-footer="{ ok }">
+            <template v-slot:modal-footer>
                 <b-button-group>
-                    <b-button variant="outline-danger" @click="ok">Import</b-button>
-                    <b-button @click="ok">Close</b-button>
+                    <b-button variant="outline-danger" @click="promptToImport"><b-icon-file-arrow-down/>Import</b-button>
+                    <b-button variant="outline-primary" @click="hideQuickViewModal">Close</b-button>
                 </b-button-group>
             </template>
         </b-modal>
@@ -29,8 +29,8 @@
                     :id="folder.id"
                     :title="folder.name" 
                     :cards="folder.cards" 
-                    :date="getRecentFolderDate(folder).time"
-                    :dateLabel="getRecentFolderDate(folder).label"
+                    :author="folder.author"
+                    @import-folder="handleImport"
                     @view-folder="showQuickViewModal"/>
                 </li>
             </ul>
@@ -58,13 +58,6 @@ export default {
         PublicFolderItem
     },
     computed: {
-        getRecentFolderDate(folder) {
-            if((new Date(folder.created)).getTime()+1000 < (new Date(folder.updated)).getTime()) {
-                return { time: folder.updated, label: "Updated" }
-            } else {
-                return { time: folder.created, label: "Created" }
-            }
-        },
         gridStyle() {
             return {
                 gridTemplateColumns: `repeat(${this.numberOfColumns}, minmax(100px, 1fr))`
@@ -73,39 +66,68 @@ export default {
         getFolders() {
             return this.$store.state.publicFolders.list;
         },
-        ...mapGetters('cards', ['getCardById'])
+        ...mapGetters('cards', ['getCardById']),
+        ...mapGetters('publicFolders', ['doesFolderExistById'])
     },
     methods: {
-        showModal(folder) {
-            this.preview = folder;
-            this.$refs['folder-view-modal'].show();
+        handleImport(folder) {
+            this.preview=folder; 
+            this.promptToImport();
         },
-        hideModal() {
+        getRecentFolderDate(folder) {
+            if((new Date(folder.created)).getTime()+1000 < (new Date(folder.updated)).getTime()) {
+                return { time: folder.updated, label: "Updated" }
+            } else {
+                return { time: folder.created, label: "Created" }
+            }
+        },
+        showQuickViewModal(folder) {
+            this.preview = folder;
+
+            // Pre-fetch cards if store doesn't have it
+            this.preview.cards.forEach(id => {
+                this.$api.prefetchCardById(id);
+            });
+
+            this.$refs['folder-view-modal'].show()
+        },
+        hideQuickViewModal() {
             this.$refs['folder-view-modal'].hide();
         },
         promptToImport() {
             this.$bvModal.msgBoxConfirm(
-                'Import this folder to your account?',
+                'Are you sure to want to add `' + this.preview.title + '` to your account?',
                 {
-                title: 'Import',
-                okVariant: 'danger',
-                okTitle: 'YES',
-                cancelTitle: 'NO',
-                footerClass: 'p-2',
-                hideHeaderClose: false,
-                centered: true
+                    title: 'Import this folder?',
+                    okVariant: 'danger',
+                    okTitle: 'YES',
+                    cancelTitle: 'NO',
+                    footerClass: 'p-2',
+                    hideHeaderClose: false,
+                    centered: true
                 }
             ).then(value => {
-                // TODO: add via API
-                value? '' : '';
-                this.$store.dispatch('folders/addFolder', this.preview);
-            })
-            .catch(err => {
-                // An error occurred
-                const alert = { message: err, type: 'danger', title: "Internal Error"};
-                this.$store.dispatch('alerts/addAlert', alert);
-            })
-      }
+                if(value) {
+                    let newFolder = {...this.preview};
+                    newFolder.name = newFolder.title;
+                    delete newFolder.title; 
+                    delete newFolder.id;
+
+                    this.$api.add.folder(newFolder).then((response) => {
+                        let payload = response.data;
+                        let folder = payload.data;
+                        this.$store.dispatch('folders/addFolder', folder);
+
+                        let alert = { message: "Imported " + this.preview.title, type: "success"};
+                        this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+                    }).catch(err => {
+                        // An error occurred
+                        const alert = { message: err.response.data.error, type: 'danger', title: "Failed to add to account"};
+                        this.$store.dispatch('alerts/addAlert', alert);
+                    });
+                }
+            });
+        }
     },
     activated() {
         // Refresh folders
@@ -134,6 +156,7 @@ export default {
   display: grid;
   grid-gap: 1em;
   padding-bottom: 20px;
+  padding-top: 20px;
 }
 
 ul {

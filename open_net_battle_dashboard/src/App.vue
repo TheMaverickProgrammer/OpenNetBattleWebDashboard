@@ -7,7 +7,7 @@
           <keep-alive :include="keepAliveList">    
             <router-view/>
           </keep-alive>
-        </transition>>
+        </transition>
       </div>
     </div>
     <div v-else>

@@ -155,14 +155,13 @@ export default {
                         let payload = response.data;
                         let folder = payload.data;
                         this.$store.dispatch('publicFolders/addFolder', folder);
-                    }); // let other errors bubble up to the outer catch
+                    }).catch(err => {
+                        // An error occurred
+                        const alert = { message: err.response.data.error, type: 'danger', title: 'Failed to share with peers'};
+                        this.$store.dispatch('alerts/addAlert', alert);
+                    })
                 }
-            })
-            .catch(err => {
-                // An error occurred
-                const alert = { message: err, type: 'danger'};
-                this.$store.dispatch('alerts/addAlert', alert);
-            })
+            });
         },
         handleCheck(folder, checked) {
             let id = folder.id;
