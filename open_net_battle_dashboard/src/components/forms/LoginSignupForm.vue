@@ -21,7 +21,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="person-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Username" id="form-name" :disabled="busy" v-model="username"></b-form-input>
+              <b-form-input placeholder="Username" id="form-name" :disabled="busy" v-model="user.username"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label-for="form-password" label-cols-lg="2">
@@ -29,7 +29,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="lock-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Password" id="form-password" type="password" :disabled="busy" v-model="password"></b-form-input>
+              <b-form-input placeholder="Password" id="form-password" type="password" :disabled="busy" v-model="user.password"></b-form-input>
             </b-input-group>
           </b-form-group>
           <div class="d-flex justify-content-center">
@@ -44,7 +44,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="person-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Username" id="form-name" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Username" id="form-name" :disabled="busy" v-model="account.username"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label-for="form-password" label-cols-lg="2">
@@ -52,7 +52,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="lock-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Password" id="form-password" type="password" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Password" id="form-password" type="password" :disabled="busy" v-model="account.password"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label-for="form-confirm-password" label-cols-lg="2">
@@ -60,7 +60,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="lock-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Re-enter password" id="form-confirm-password" type="password" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Re-enter password" id="form-confirm-password" type="password" :disabled="busy" v-model="confirmPassword"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label-for="form-mail" label-cols-lg="2">
@@ -68,7 +68,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="envelope-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Email" id="form-email" type="email" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Email" id="form-email" type="email" :disabled="busy" v-model="account.email"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label-for="form-twitter" label-cols-lg="2">
@@ -76,7 +76,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="at"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Twitter" id="form-twitter" :disabled="busy"></b-form-input>
+              <b-form-input placeholder="Twitter" id="form-twitter" :disabled="busy" v-model="account.twitter"></b-form-input>
             </b-input-group>
           </b-form-group>
           <div class="d-flex justify-content-center">
@@ -125,8 +125,9 @@ export default {
             processing: false,
             counter: 1,
             interval: null,
-            username: "",
-            password: "",
+            user: { username: "", password: ""},
+            account: { username: "", password: "", twitter: "", email: ""},
+            confirmPassword: "",
             showLoginForm: true
         }
     },
@@ -151,27 +152,26 @@ export default {
           this.onSubmit(null, true);
         },
         onSubmit(evt, autoLogin) {
-            this.busy = true;
-            this.counter = 1;
-            this.processing = true;
+          if(autoLogin || this.showLoginForm) {
+            this.handleLoginAction(autoLogin);
+          } else {
+            this.handleSignupAction();
+          }
+        },
+        handleLoginAction(autoLogin) {
+          this.busy = true;
+          this.counter = 1;
+          this.processing = true;
+          let self = this;
 
-            let self = this;
-
-            // Simulate an async request
-            axios.get('http://battlenetwork.io:3000/v1/login', 
-                {
-                    cancelToken: new axios.CancelToken(function executor(c) {
-                        self.cancelRequest = c;
-                    }),
-                    withCredentials: true, 
-                    auth: { username: this.username, password: this.password },
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                }, 
-            )
-            .then(response => {
+          this.$api.login( 
+            { username: this.user.username, password: this.user.password },
+            new axios.CancelToken(function executor(c) {
+              self.cancelRequest = c;
+            }),
+            autoLogin, // if true, silences errors
+            (response) => {
                 this.$store.dispatch('loginUser', response.data.user);
-
-
                 let alert = {};
                 
                 if(autoLogin) {
@@ -181,33 +181,46 @@ export default {
                 }
 
                 this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-            }).catch(err => {
-                if(!autoLogin) {
-                  let alert = { message: err, type: "danger", title: "Internal Error" };
-                  this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-                }
+            })
+          .finally(() => {
+              this.clearInterval();
+              this.busy = this.processing = false;
+          });
 
-                // let auto login fail silently
-            }).finally(() => {
-                this.clearInterval();
-                this.busy = this.processing = false;
-            });
-
-            this.clearInterval()
-            this.interval = setInterval(() => {
-                if (this.counter < 20) {
-                    this.counter = this.counter + 1
-                } else {
-                    this.clearInterval()
-                    this.$nextTick(() => {
-                        this.busy = this.processing = false;
-                        this.cancelRequest("Login timeout");
-                    })
-                }
-            }, 350)
+          this.clearInterval()
+          this.interval = setInterval(() => {
+              if (this.counter < 20) {
+                  this.counter = this.counter + 1
+              } else {
+                  this.clearInterval()
+                  this.$nextTick(() => {
+                      this.busy = this.processing = false;
+                      this.cancelRequest("Login timeout");
+                  })
+              }
+          }, 350)
         },
         cancelLoginAction() {
             this.$emit('cancel-action');
+        },
+        handleSignupAction() {
+          if(this.account.password != this.confirmPassword) {
+            let alert = {message: "Passwords did not match", type: "danger"};
+            this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+            return;
+          }
+
+          this.busy = true;
+          this.processing = true;
+
+          this.$api.signup(this.account, 
+          () => {
+              let alert = {message: "You can now log in with your new account", type: "info"};
+              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+              this.showLoginForm = true;
+          }).finally(() => {
+              this.busy = this.processing = false;
+          });
         }
     }
 }

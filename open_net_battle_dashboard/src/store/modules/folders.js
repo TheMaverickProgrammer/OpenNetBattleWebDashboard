@@ -1,3 +1,5 @@
+import Vue from 'vue'
+
 export const folders = {
     namespaced: true,
     state: {
@@ -7,12 +9,20 @@ export const folders = {
         getFolderById: (state) => (id) => {
             return state.list.find( folder => folder.id == id) 
                 || { name: "", cards: [], date: 0 };
+        },
+        doesFolderExistById: (state) => (id) => {
+            let index = state.list.findIndex(folderItem => folderItem.id == id);
+
+            return (index > -1);
         }
     },
     mutations: {
         doAddFolder(state, folder) {
-            folder.id = folder._id;
-            delete folder._id;
+            if(typeof folder.id === 'undefined' && folder._id) {
+                folder.id = folder._id;
+                delete folder._id;
+            }
+
             state.list = [folder, ...state.list];
         },
         doRemoveFolder(state, id) {
@@ -24,6 +34,18 @@ export const folders = {
         },
         doClearFolders(state) {
             state.list = []
+        },
+        doUpdateFolder(state, folder) {
+            if(typeof folder.id === 'undefined' && folder._id) {
+                folder.id = folder._id;
+                delete folder._id;
+            }
+
+            let index = state.list.findIndex(folderItem => folderItem.id == folder.id);
+
+            if(index > -1) {
+               Vue.set(state.list, index, folder);
+            }
         }
     },
     actions: {
@@ -35,6 +57,9 @@ export const folders = {
         },
         clearFolders(context) {
             context.commit('doClearFolders');
+        },
+        updateFolder(context, folder) {
+            context.commit('doUpdateFolder', folder);
         }
     }
 }

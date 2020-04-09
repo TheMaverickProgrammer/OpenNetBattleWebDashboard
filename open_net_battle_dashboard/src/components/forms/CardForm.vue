@@ -138,6 +138,14 @@
                     required
                     ></b-form-textarea>
                 </b-form-group>
+                
+                <b-form-group 
+                    description="Click to open script editor for card">
+                    <b-button variant="dark">
+                        <b-icon-code-slash @click="handleEditCode"/>
+                    </b-button>
+                </b-form-group>
+
                 <!-- Form buttons go here b/c it looks better -->
                 <b-button-group>
                     <b-button type="submit" variant="info">Submit</b-button>
@@ -208,6 +216,10 @@ export default {
             if(value < 0) value = 0;
             if(value > 9999) value = 9999;
             return value;
+        },
+        handleEditCode(evt) {
+            evt.preventDefault();
+            this.$router.push('/cards/0/edit/script');
         }
     }
 }

@@ -3,6 +3,10 @@ import App from './App.vue'
 import router  from './router'
 import store from './store/'
 
+// API handles Open Net Battle Web Data API requests and interfaces directly with the store
+import api from './api/'
+Vue.use(api, {store});
+
 // This imports all the layout components such as <b-container>, <b-row>, <b-col>:
 import { LayoutPlugin } from 'bootstrap-vue'
 Vue.use(LayoutPlugin)
@@ -28,12 +32,15 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
+/*
+Vanilla js and css imports
+*/
 import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
+/* eslint-disable no-new */
 Vue.config.productionTip = false
 
-/* eslint-disable no-new */
 export const bus = new Vue({
   el: '#app',
   router,

@@ -12,7 +12,7 @@
       :select-mode="selectMode"
       :items="cards"
       :fields="fields"
-      :busy="isBusy"
+      :busy="busy"
       :per-page="perPage"
       :current-page="currentPage"
     >
@@ -26,7 +26,7 @@
       <!-- A custom formatted column -->
       <template v-slot:cell(actions)="data" v-if="hasActions">
         <p class="h3 mb-2" @click="$emit('remove-cards', [data.item])">
-          <b-icon variant="danger" icon="x-circle" class="action" v-if="removable"/>
+          <b-icon variant="danger" icon="x-circle" class="action" v-if="removable" v-b-tooltip.hover.top="'Remove card'"/>
         </p>
       </template>
 
@@ -107,7 +107,11 @@
             <a href="#" @click="showModal(card)">
               <img :src="card.image" v-b-tooltip.hover.top="card.name + ' (' + card.code + ')'" class="queued"/>
             </a>
-        </span><br>
+        </span>
+        <span v-if="selected.length==0">
+          &lt; no selection &gt;
+        </span>
+        <br>
         <template v-slot:footer>
           <b-button @click="handleSubmit" :variant="selected.length == 0? 'outline-secondary' : 'success'" :disabled="selected.length == 0">Add To Folder</b-button>
         </template>
@@ -139,6 +143,10 @@ export default {
       cards: {
         default: new Array(),
         type: Array
+      },
+      busy: {
+        default: false,
+        type: Boolean
       }
     },
     computed: {
@@ -168,7 +176,6 @@ export default {
             fields: fields,
             selectMode: 'multi',
             selected: [],
-            isBusy: false,
             perPage: 20,
             currentPage: 1,
             rows: 0,
