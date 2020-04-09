@@ -21,18 +21,18 @@
                                 {{ cards.length }}/{{ maxCardSize }}
                             </b-card-text>
                         </b-col>
+                        <b-col cols="0">
+                            <b-icon-folder/>
+                        </b-col>
                     </b-row>
                 </b-container>
             </template>
             <b-container class="bv-example-row">
-            <b-row>
-                <b-col>
-                    <b-button href="#" variant="primary" @click="$emit('view-folder', getSelf)" :disabled="cards.length==0">Quick View</b-button>
-                </b-col>
-                <b-col>
-                    <b-button href="#" variant="outline-primary" @click="$emit('edit-folder', getSelf)">Edit</b-button>
-                </b-col>
-            </b-row>
+            <b-button-group>
+                    <b-button href="#" variant="primary" @click="$emit('view-folder', getSelf)" :disabled="cards.length==0">View</b-button>
+                    <b-button href="#" variant="info" @click="$emit('rename-folder', getSelf)">Rename</b-button>
+                    <b-button href="#" variant="outline-info" @click="$emit('edit-folder', getSelf)">Edit</b-button>
+            </b-button-group>
             </b-container>
 
             <template v-slot:footer>
@@ -51,7 +51,7 @@ export default {
     },
     computed: {
         getSelf() {
-            return {title: this.title, cards: this.cards, date: this.date, id: this.id };
+            return {name: this.title, cards: this.cards, date: this.date, id: this.id };
         },
         getDate() {
             let dateObj = new Date(this.date);
@@ -92,6 +92,10 @@ export default {
             type: Boolean
         },
         checkable: {
+            default: false,
+            type: Boolean
+        },
+        editName: {
             default: false,
             type: Boolean
         }

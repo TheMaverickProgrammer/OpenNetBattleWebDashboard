@@ -16,21 +16,23 @@ const resources = {
 }
 
 const api = {
-    login(username, password, cancelToken) {
-        return axios.get(resources.LOGIN,
-            {
-                cancelToken: cancelToken || null,
-                withCredentials: true,
-                auth: { username: username, password: password },
-                headers: { 'Content-Type': 'application/json' },
-            })
-    },
-    logout() {
-        return axios.get(resources.LOGOUT,
-            {
-                withCredentials: true,
-                headers: { 'Content-Type': 'application/json' },
-            })
+    auth: {
+        login(username, password, cancelToken) {
+            return axios.get(resources.LOGIN,
+                {
+                    cancelToken: cancelToken || null,
+                    withCredentials: true,
+                    auth: { username: username, password: password },
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        logout() {
+            return axios.get(resources.LOGOUT,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
     },
     /* 
     demoteAdmin(userId) {
@@ -122,7 +124,15 @@ const api = {
                     withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
-        }
+        },
+        user(user) {
+            return axios.post(resources.USERS,
+                user,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
     },
     update: {
         cardModel(cardModel) {
@@ -215,9 +225,27 @@ const plugin = {
         }
 
         let store = options.store;
-        Vue.api = api;
+        Vue.prototype.$api = {};
         Vue.prototype.$api = api;
-
+        Vue.prototype.$api.login = function(credentials, cancelToken, silenceError, onData) {
+            return api.auth.login(credentials.username, credentials.password, cancelToken)
+            .then(onData)
+            .catch(err=>{
+                if(silenceError) return;
+                let alert = { message: err.message, type: "danger", title: "Login Failed" };
+                store.dispatch('alerts/addAlert', alert, { namespaced: true });
+            });
+        },
+        Vue.prototype.$api.signup = function(account, onData) {
+            console.log("signup");
+            console.log(JSON.stringify(account));
+            return api.add.user(account)
+            .then(onData)
+            .catch(err=>{
+                let alert = { message: err.response.data.error, type: "info", title: "Signup Failed" };
+                store.dispatch('alerts/addAlert', alert, { namespaced: true });
+            });
+        },
         Vue.prototype.$api.prefetchCardById = function (id, onComplete) {
             onComplete = onComplete || function () { };
 
@@ -230,7 +258,7 @@ const plugin = {
                     store.dispatch('cards/addCard', payload.data.data);
                     card = getCardById(id);
                 }).catch(err => {
-                    let alert = { message: err, type: "danger", title: "error" };
+                    let alert = { message: err.response.data.error, type: "danger", title: "error" };
                     store.dispatch('alerts/addAlert', alert, { namespaced: true });
                 }).finally(() => { onComplete(card) });
             } else {
@@ -253,7 +281,7 @@ const plugin = {
                     store.dispatch('folders/addFolder', payload.data.data);
                     folder = getFolderById(id);
                 }).catch(err => {
-                    let alert = { message: err, type: "danger", title: "error" };
+                    let alert = { message:  err.response.data.error, type: "danger", title: "error" };
                     store.dispatch('alerts/addAlert', alert, { namespaced: true });
                 }).finally(() => { onComplete(folder) });
             } else {

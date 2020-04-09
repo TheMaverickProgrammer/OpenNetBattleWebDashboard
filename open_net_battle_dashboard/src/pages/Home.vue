@@ -1,8 +1,9 @@
 <template>
     <div class="app-background">
-        <b-button v-b-toggle.collapse-1 variant="info" class="command-panel"><b-icon-arrow90deg-down/>Command Panel</b-button>
-        <b-collapse id="collapse-1" class="mt-2">
-            <div v-if="$store.state.user.isAdmin || true">
+        <UserForm :user="$store.state.user"/>
+        <div v-if="$store.state.user.isAdmin">
+            <b-button v-b-toggle.collapse-1 variant="info" class="command-panel"><b-icon-arrow90deg-down/>Command Panel</b-button>
+            <b-collapse id="collapse-1" class="mt-2">
                 <p class="card-text">Admin commands</p>
                 <b-card-group>
                     <b-card>
@@ -39,17 +40,19 @@
                 <b-collapse id="collapse-2" class="mt-2" v-model="showProxy">
                     <component :is="formType"/>
                 </b-collapse>
-            </div>
-        </b-collapse>
+            </b-collapse>
+        </div>
     </div>
 </template>
 
 <script>
 import CardForm from '@/components/forms/CardForm'
+import UserForm from '@/components/forms/UserForm'
 
 export default {
     components: {
-        CardForm
+        CardForm,
+        UserForm
     },
     props: {
         show: {

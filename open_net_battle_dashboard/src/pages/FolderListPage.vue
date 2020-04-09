@@ -1,21 +1,9 @@
 <template>
     <div>
         <!-- modals -->
-        <b-modal ref="folder-create-modal"
-            title="Create New Folder"
-            :busy="busy">
-            <b-form @submit.stop.prevent="handleFolderCreate">
-                <b-form-input placeholder="Name" required v-model="newFolderName"/>
-                <b-button-group>
-                    <b-button variant="outline-success" type="submit"><b-icon-folder-check/>Create</b-button>
-                    <b-button>Cancel</b-button>
-                </b-button-group>
-            </b-form>
-        </b-modal>
-
         <b-modal scrollable 
             ref="folder-view-modal" 
-            :title="'\''+ preview.title + '\' Quick View'">
+            :title="'\''+ preview.name + '\' Quick View'">
             <div class="d-block text-center">
                 <b-list-group>
                     <b-list-group-item :key="id" v-for="id in preview.cards" class="d-flex justify-content-between align-items-center">
@@ -33,17 +21,40 @@
             </template>
         </b-modal>
 
+        <b-modal 
+            ref="folder-rename-modal" 
+            :title="'\''+ rename.name + '\' Rename'"
+            @ok="sendRenameRequest">
+            <b-input v-model="newTitle"/>
+        </b-modal>
+
         <!-- app contents begin -->
         <div class="app-background">
             <b-container fluid class="action-panel">
                 <b-row>
                     <b-col align-self="start" cols="2">
-                        <b-button variant="outline-success" block @click="showCreateFolderModal"><b-icon icon="folder-plus"/>New</b-button>
+                        <b-button variant="outline-success" block @click="toggleCreateFolder"><b-icon icon="folder-plus"/>New</b-button>
                     </b-col>
                     <b-col cols="2">
                         <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/>Delete</b-button>
                     </b-col>
                 </b-row>
+                <b-collapse id="folder-collapse" v-model="showCreateFolder">
+                        <b-card>
+                            <b-form @submit.stop.prevent="handleFolderCreate">
+                                <b-row>
+                                <b-col cols="3">
+                                <b-form-input placeholder="Name" required v-model="newFolderName"/>
+                                </b-col>
+                                <b-col cols="2">
+                                <b-button-group>
+                                    <b-button variant="outline-success" type="submit"><b-icon-folder-check/>Create</b-button>
+                                </b-button-group>
+                                </b-col>
+                                </b-row>
+                            </b-form>
+                        </b-card>
+                </b-collapse>
             </b-container>
 
             <hr>
@@ -59,7 +70,9 @@
                     :dateLabel="getRecentFolderDate(folder).label"
                     @view-folder="showQuickViewModal"
                     @check-folder="handleCheck"
-                    @edit-folder="handleEdit"/>
+                    @edit-folder="handleEdit"
+                    @rename-folder="showRenameModal"
+                    />
                 </li>
             </ul>
         </div>
@@ -76,11 +89,14 @@ export default {
     data() {
         return {
             preview: { name: "", cards: [], timestamp: "" },
+            rename: {},
             newFolderName: "",
             numberOfColumns: 3,
             checkedList: [],
             busy: false,
-            lastUpdated: 0
+            lastUpdated: 0,
+            showCreateFolder: false,
+            newTitle: "",
         }
     },
     components: {
@@ -126,11 +142,35 @@ export default {
         hideQuickViewModal() {
             this.$refs['folder-view-modal'].hide();
         },
-        showCreateFolderModal() {
-            this.$refs['folder-create-modal'].show()
+        showRenameModal(folder) {
+            this.rename = folder;
+            this.newTitle = folder.name;
+            this.$refs['folder-rename-modal'].show()
         },
-        hideCreateFolderModal() {
-            this.$refs['folder-create-modal'].hide();
+        hideRenameModal() {
+            this.$refs['folder-rename-modal'].hide();
+        },
+        sendRenameRequest() {
+            let folder = this.rename;
+            this.rename.name = this.newTitle;
+
+            this.$api.update.folder(folder).then( response => {
+                let payload = response.data;
+                let updatedFolder = payload.data;
+                this.$store.dispatch('folders/updateFolder', updatedFolder, {namespaced: true});
+            }).catch(err => {
+                // An error occurred
+                const alert = { message: err.response.data.error, type: 'danger', title: 'Failed to rename folder'};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced:true});
+            })
+
+            this.hideRenameModal();
+        },
+        toggleCreateFolder() {
+            this.showCreateFolder = !this.showCreateFolder;
+        },
+        hideCreateFolder() {
+            this.showCreateFolder = false;
         },
         promptToShare() {
             this.$bvModal.msgBoxConfirm(
@@ -147,18 +187,16 @@ export default {
             ).then(value => {
                 if(value) {
                     let newFolder = {...this.preview};
-                    newFolder.name = newFolder.title;
-                    delete newFolder.title; 
                     delete newFolder.id;
 
-                    this.$api.add.publicFolder(newFolder).then((response) => {
+                    this.$api.raw.add.publicFolder(newFolder).then((response) => {
                         let payload = response.data;
                         let folder = payload.data;
-                        this.$store.dispatch('publicFolders/addFolder', folder);
+                        this.$store.dispatch('publicFolders/addFolder', folder, {namespaced: true});
                     }).catch(err => {
                         // An error occurred
                         const alert = { message: err.response.data.error, type: 'danger', title: 'Failed to share with peers'};
-                        this.$store.dispatch('alerts/addAlert', alert);
+                        this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
                     })
                 }
             });
@@ -194,7 +232,7 @@ export default {
                 ).then(value => {
                     if(value) {
                         this.checkedList.forEach((id) => {
-                            this.$api.delete.folder(id).then(payload=>{
+                            this.$api.raw.delete.folder(id).then(payload=>{
                                 this.$store.dispatch('folders/removeFolder', id);
                                 const alert = { message: payload.data.data.message, type: 'info'};
                                 this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
