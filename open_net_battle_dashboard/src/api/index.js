@@ -63,6 +63,13 @@ const api = {
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
+        user(id) {
+            return axios.get(resources.USERS + "/" + id,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
         /* 
         API uses time to fetch real-time updates
         Use `milli = 0` to fetch all resources of type

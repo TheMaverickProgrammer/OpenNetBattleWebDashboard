@@ -1,6 +1,13 @@
 <template>
     <div class="app-background">
-        <UserForm :user="$store.state.user"/>
+        <b-card>
+            <b-form-checkbox switch>Change password</b-form-checkbox>
+            <UserForm 
+            :user="getUserAccount"
+            :password="changePassword"
+            @on-submit="handleUserUpdate"
+            />
+        </b-card>
         <div v-if="$store.state.user.isAdmin">
             <b-button v-b-toggle.collapse-1 variant="info" class="command-panel"><b-icon-arrow90deg-down/>Command Panel</b-button>
             <b-collapse id="collapse-1" class="mt-2">
@@ -54,6 +61,9 @@ export default {
         CardForm,
         UserForm
     },
+    computed: {
+        getUserAccount() { return this.userInfo; }
+    },
     props: {
         show: {
             type: Boolean,
@@ -66,14 +76,49 @@ export default {
     },
     data() {
         return {
-            showProxy: this.show
+            showProxy: this.show,
+            userInfo: {},
+            changePassword: false
         }
     },
     methods: {
         handleCreateCard() {
-            this.formType = "CardForm";
+            this.formType = "CardForm"; // using Vue component tag to render form types dynamically
             this.showProxy = true;
+        },
+        handleUserUpdate(user, confirmPassword) {
+            console.log(JSON.stringify(user));
+
+            if(confirmPassword) {
+                if(user.password != confirmPassword) {
+                    let alert = {message: "Passwords did not match", type: "danger"};
+                    this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+                    return;
+                }
+            }
+
+            this.$api.update.user(user).then(response => {
+                let newUser =  response.data.data;
+                this.$store.dispatch('setUser', newUser);
+                this.userInfo = newUser;
+
+                let alert = {message: "Account updated", type: "info"};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+            }).catch(err=>{
+                let alert = {message: err.response.data.error, title: "Failed to update account", type: "danger"};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+            })
         }
+    },
+    mounted() {
+        this.$api.get.user(this.$store.state.user.userId).then(response => {
+            this.userInfo = response.data.data;
+            this.userInfo.id = this.userInfo.userId;
+            delete this.userInfo.userId;
+        }).catch(err => {
+            let alert = {message: err.response.data.error, title: "Failed to fetch account", type: "danger"};
+            this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+        });
     }
 }
 </script>

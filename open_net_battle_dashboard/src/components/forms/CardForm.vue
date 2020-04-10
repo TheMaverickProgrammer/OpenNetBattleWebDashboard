@@ -212,7 +212,6 @@ export default {
         },
         damageFormatter(value) {
             value = Number(value);
-            value = 5 * Math.ceil(value / 5); // steps of 5
             if(value < 0) value = 0;
             if(value > 9999) value = 9999;
             return value;
