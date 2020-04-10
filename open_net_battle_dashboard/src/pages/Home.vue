@@ -1,7 +1,7 @@
 <template>
     <div class="app-background">
         <b-card>
-            <b-form-checkbox switch>Change password</b-form-checkbox>
+            <b-form-checkbox switch v-model="changePassword">Change password</b-form-checkbox>
             <UserForm 
             :user="getUserAccount"
             :password="changePassword"
@@ -127,4 +127,9 @@ export default {
 .command-panel {
     margin: 10px;
 }
+
+.custom-control-label {
+    display: inline-block;
+}
+
 </style>

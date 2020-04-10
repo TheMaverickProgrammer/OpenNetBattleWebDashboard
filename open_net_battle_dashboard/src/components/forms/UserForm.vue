@@ -1,6 +1,6 @@
 <template>
     <!-- signup form -->
-    <b-form @submit.prevent="handleSubmit">
+    <b-form @submit.prevent="handleSubmit" :id="myUniqueId">
         <b-form-group label-for="form-name" label-cols-lg="2">
             <b-input-group>
                 <b-input-group-prepend is-text>
@@ -14,7 +14,7 @@
                 <b-input-group-prepend is-text>
                 <b-icon icon="lock-fill"></b-icon>
                 </b-input-group-prepend>
-                <b-form-input placeholder="Password" id="form-password" type="password" :disabled="isBusy" v-model="userProxy.password"></b-form-input>
+                <b-form-input placeholder="New Password" id="form-password" type="password" :disabled="isBusy" v-model="userProxy.password"></b-form-input>
             </b-input-group>
         </b-form-group>
         <b-form-group label-for="form-confirm-password" label-cols-lg="2" v-if="password">
@@ -48,6 +48,8 @@
 </template>
 
 <script>
+import uuidv4 from 'uuid/v4'
+
 export default {
     props: {
         user: {
@@ -67,12 +69,17 @@ export default {
         return {
             userProxy: { username: "", password: "", email: "", twitter: ""},
             confirmPassword: "",
-            isBusy: false
+            isBusy: false,
+            myUniqueId: "user-form-" + uuidv4()
         }
     },
     watch: {
         user: function() {
             this.userProxy = this.user;
+        },
+        password: function() {
+            console.log("toggled!");
+            this.manageLabelVisibility();
         }
     },
     methods: {
@@ -85,16 +92,19 @@ export default {
         },
         handleSubmit() {    
             this.$emit('on-submit', this.userProxy, this.password? this.confirmPassword : null);
+        },
+        manageLabelVisibility() { 
+            if(this.showLabels) return;
+
+            let nodes = document.querySelectorAll("#" + this.myUniqueId + " label");
+
+            nodes.forEach(node => {
+                node.style.display = 'none';
+            })
         }
     },
     mounted() {
-        if(this.showLabels) return;
-
-        let nodes = document.querySelectorAll("label");
-
-        nodes.forEach(node => {
-            node.style.display = 'none';
-        })
+        this.manageLabelVisibility();
     }
 }
 </script>
