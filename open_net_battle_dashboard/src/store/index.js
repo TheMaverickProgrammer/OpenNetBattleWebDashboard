@@ -30,6 +30,14 @@ export default new Vuex.Store({
         loginUser(context, user) {
             context.commit('doSetUser', user);
         },
+        setUser(context, user) {
+            if(typeof user.userId === 'undefined' && user._id) {
+                user.userId = user._id;
+                delete user._id;
+            }
+            
+            context.commit('doSetUser', user);
+        },
         logoutUser(context) {
             let user = {
                 username: "",

@@ -12,7 +12,7 @@ const resources = {
     USERS: base_url + "/users",
     FOLDERS: base_url + "/folders",
     PUBLIC_FOLDERS: base_url + '/public-folders',
-    CARD_MODELS: base_url + '/card-mdodels',
+    CARD_MODELS: base_url + '/card-models',
 }
 
 const api = {
@@ -234,6 +234,7 @@ const plugin = {
         let store = options.store;
         Vue.prototype.$api = {};
         Vue.prototype.$api = api;
+
         Vue.prototype.$api.login = function(credentials, cancelToken, silenceError, onData) {
             return api.auth.login(credentials.username, credentials.password, cancelToken)
             .then(onData)
@@ -243,16 +244,34 @@ const plugin = {
                 store.dispatch('alerts/addAlert', alert, { namespaced: true });
             });
         },
+
         Vue.prototype.$api.signup = function(account, onData) {
-            console.log("signup");
-            console.log(JSON.stringify(account));
             return api.add.user(account)
             .then(onData)
             .catch(err=>{
-                let alert = { message: err.response.data.error, type: "info", title: "Signup Failed" };
+                let payload =  err.response.data.error;
+                let message = payload;
+
+                if(typeof payload.name !== 'undefined') {
+                    message = payload.message;
+                }
+
+                // mongo error
+                if(typeof payload.errmsg !== 'undefined') {
+                    if(String(payload.code) === "11000") {
+                        if(payload.errmsg.indexOf("email") > -1) {
+                            message = "Email in use by another user!"
+                        } else if(payload.errmsg.indexOf("username") > -1) {
+                            message = "Username already exists!"
+                        }
+                    }
+                }
+
+                let alert = {message: message, type: "warning", title: "Signup Failed" };
                 store.dispatch('alerts/addAlert', alert, { namespaced: true });
             });
         },
+
         Vue.prototype.$api.prefetchCardById = function (id, onComplete) {
             onComplete = onComplete || function () { };
 

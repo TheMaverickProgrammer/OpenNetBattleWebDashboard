@@ -14,7 +14,7 @@
 
       <div :class="{ 'white-panel': true, 'right-log': !showLoginForm}">
         <!-- login form -->
-        <b-form :class="{ 'login-show': true, 'show-log-panel': showLoginForm}" @submit.prevent="onSubmit">
+        <b-form :class="{ 'login-show': true, 'show-log-panel': showLoginForm}" @submit.prevent="handleLoginAction">
           <h2>Login</h2>
           <b-form-group label-for="form-name" label-cols-lg="2">
             <b-input-group>
@@ -37,52 +37,7 @@
           </div>
         </b-form>
         <!-- signup form -->
-        <b-form :class="{ 'register-show': true, 'show-log-panel': !showLoginForm}" @submit.prevent="onSubmit">
-          <h2>Create Account</h2>
-          <b-form-group label-for="form-name" label-cols-lg="2">
-            <b-input-group>
-              <b-input-group-prepend is-text>
-                <b-icon icon="person-fill"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input placeholder="Username" id="form-name" :disabled="busy" v-model="account.username"></b-form-input>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group label-for="form-password" label-cols-lg="2">
-            <b-input-group>
-              <b-input-group-prepend is-text>
-                <b-icon icon="lock-fill"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input placeholder="Password" id="form-password" type="password" :disabled="busy" v-model="account.password"></b-form-input>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group label-for="form-confirm-password" label-cols-lg="2">
-            <b-input-group>
-              <b-input-group-prepend is-text>
-                <b-icon icon="lock-fill"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input placeholder="Re-enter password" id="form-confirm-password" type="password" :disabled="busy" v-model="confirmPassword"></b-form-input>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group label-for="form-mail" label-cols-lg="2">
-            <b-input-group>
-              <b-input-group-prepend is-text>
-                <b-icon icon="envelope-fill"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input placeholder="Email" id="form-email" type="email" :disabled="busy" v-model="account.email"></b-form-input>
-            </b-input-group>
-          </b-form-group>
-          <b-form-group label-for="form-twitter" label-cols-lg="2">
-            <b-input-group>
-              <b-input-group-prepend is-text>
-                <b-icon icon="at"></b-icon>
-              </b-input-group-prepend>
-              <b-form-input placeholder="Twitter" id="form-twitter" :disabled="busy" v-model="account.twitter"></b-form-input>
-            </b-input-group>
-          </b-form-group>
-          <div class="d-flex justify-content-center">
-            <b-button class="submit" ref="submit" type="submit" :disabled="busy">Submit</b-button>
-          </div>
-        </b-form>
+        <UserForm title="Create Account" password :class="{ 'register-show': true, 'show-log-panel': !showLoginForm}" @on-submit="handleSignupAction"/>
 
         <!-- busy overlay -->
         <b-overlay :show="busy" no-wrap>
@@ -117,8 +72,11 @@
 
 <script>
 import axios from 'axios'
-
+import UserForm from '@/components/forms/UserForm'
 export default {
+    components: {
+      UserForm
+    },
     data() {
         return {
             busy: false,
@@ -126,7 +84,6 @@ export default {
             counter: 1,
             interval: null,
             user: { username: "", password: ""},
-            account: { username: "", password: "", twitter: "", email: ""},
             confirmPassword: "",
             showLoginForm: true
         }
@@ -149,16 +106,9 @@ export default {
             }
         },
         autoLogin() {
-          this.onSubmit(null, true);
+          this.handleLoginAction(null, true);
         },
-        onSubmit(evt, autoLogin) {
-          if(autoLogin || this.showLoginForm) {
-            this.handleLoginAction(autoLogin);
-          } else {
-            this.handleSignupAction();
-          }
-        },
-        handleLoginAction(autoLogin) {
+        handleLoginAction(evt, autoLogin) {
           this.busy = true;
           this.counter = 1;
           this.processing = true;
@@ -203,17 +153,21 @@ export default {
         cancelLoginAction() {
             this.$emit('cancel-action');
         },
-        handleSignupAction() {
-          if(this.account.password != this.confirmPassword) {
-            let alert = {message: "Passwords did not match", type: "danger"};
-            this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-            return;
+        handleSignupAction(account, confirmPassword) {
+          if(confirmPassword.length == 0 || account.password.length == 0)  {
+              let alert = {message: "Enter both password fields", type: "danger", title: "Choose a password"};
+              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+              return;
+          } else if(account.password != confirmPassword) {
+              let alert = {message: "Passwords did not match", type: "danger", title: "WRITE IT DOWN SOMEWHERE"};
+              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+              return;
           }
 
           this.busy = true;
           this.processing = true;
 
-          this.$api.signup(this.account, 
+          this.$api.signup(account, 
           () => {
               let alert = {message: "You can now log in with your new account", type: "info"};
               this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});

@@ -192,10 +192,33 @@ export default {
     methods: {
         onSubmit(evt) {
             evt.preventDefault();
-            this.$store.dispatch('cards/addCard', this.preview, {namespaced:true}); // TODO: submit to API and get new ID
-            let alert = { message: "New card '" + this.preview.name + "' added!", type:"success"};
-            this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
-            this.onReset();
+
+            let copy = Object.assign({}, this.preview);
+            copy.codes = copy.codeFamily;
+            delete copy.codeFamily;
+
+            this.$api.add.cardModel(this.copy).then((response)=>{
+                this.$store.dispatch('cards/addCard', response.data, {namespaced:true}); 
+
+                let alert = { message: "New card '" + response.data.name + "' added!", type:"success"};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                this.onReset();
+            }).catch(err => {
+                let payload = err.response.data.error;
+                let message = message;
+
+                if(typeof payload.name !== 'undefined') {
+                    message = payload.message;
+                }
+
+                // mongo error
+                if(typeof payload.errmsg !== 'undefined') {
+                    message = payload.errmsg;
+                }
+
+                let alert = {message: message, type: "danger", title: "Failed to create card"};
+                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+            });
         },
         onReset(evt) {
             evt? evt.preventDefault() : 0;

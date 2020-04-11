@@ -69,6 +69,11 @@ export default {
             default: false
         }
     },
+    data() {
+        return {
+            showProxy: this.show
+        }
+    },
     watch: {
         show(next) {
             this.$nextTick( () => {
@@ -79,13 +84,15 @@ export default {
     },
     methods: {
         showModal() {
+            this.showProxy = true;
             this.$refs['card-view-modal'].show();
         },
         hideModal() {
+            this.showProxy = false;
             this.$refs['card-view-modal'].hide();
         },
         handleHidden() {
-            this.show = false;
+            this.showProxy = false;
             this.$emit('hidden');
         },
         convertLineBreakToHTML(string) {

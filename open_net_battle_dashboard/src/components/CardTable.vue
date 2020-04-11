@@ -154,6 +154,13 @@ export default {
         return this.removable; // add more conditions as see fit
       },
     },
+    watch: {
+      currentPage() {
+        // will make the scrollbar reset
+        this.$refs.selectableTable.$el.scrollTop = 0;
+
+      }
+    },
     data() {
         let fields = [
           { key: 'image', sortable: false },
