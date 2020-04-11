@@ -189,7 +189,7 @@ export default {
                     let newFolder = {...this.preview};
                     delete newFolder.id;
 
-                    this.$api.raw.add.publicFolder(newFolder).then((response) => {
+                    this.$api.add.publicFolder(newFolder).then((response) => {
                         let payload = response.data;
                         let folder = payload.data;
                         this.$store.dispatch('publicFolders/addFolder', folder, {namespaced: true});
@@ -232,7 +232,7 @@ export default {
                 ).then(value => {
                     if(value) {
                         this.checkedList.forEach((id) => {
-                            this.$api.raw.delete.folder(id).then(payload=>{
+                            this.$api.delete.folder(id).then(payload=>{
                                 this.$store.dispatch('folders/removeFolder', id);
                                 const alert = { message: payload.data.data.message, type: 'info'};
                                 this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
