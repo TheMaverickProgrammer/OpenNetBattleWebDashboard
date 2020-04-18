@@ -197,22 +197,31 @@ export default {
             copy.codes = copy.codeFamily;
             delete copy.codeFamily;
 
-            this.$api.add.cardModel(this.copy).then((response)=>{
+            this.$api.add.cardModel(copy).then((response)=>{
                 this.$store.dispatch('cards/addCard', response.data, {namespaced:true}); 
 
                 let alert = { message: "New card '" + response.data.name + "' added!", type:"success"};
                 this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
                 this.onReset();
             }).catch(err => {
-                let payload = err.response.data.error;
-                let message = message;
+                let payload = err;
+                let message = "Unknown error";
 
-                if(typeof payload.name !== 'undefined') {
+
+                console.log(JSON.stringify(payload.response.data));
+
+                if(typeof payload.response.data !== 'undefined') {
+                    message = payload.response.data.error.message;
+                }else if(typeof payload.response !== 'undefined') {
+                    if(payload.response.data.length > 0) {
+                        message = payload.response.data;
+                    } else {
+                        message = "Response: " + payload.response.statusText;
+                    }
+                }else if(typeof payload.name !== 'undefined') {
                     message = payload.message;
-                }
-
-                // mongo error
-                if(typeof payload.errmsg !== 'undefined') {
+                } // mongo specific error
+                else if(typeof payload.errmsg !== 'undefined') {
                     message = payload.errmsg;
                 }
 
