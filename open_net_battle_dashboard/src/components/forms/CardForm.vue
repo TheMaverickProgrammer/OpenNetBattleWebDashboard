@@ -207,9 +207,6 @@ export default {
                 let payload = err;
                 let message = "Unknown error";
 
-
-                console.log(JSON.stringify(payload.response.data));
-
                 if(typeof payload.response.data !== 'undefined') {
                     message = payload.response.data.error.message;
                 }else if(typeof payload.response !== 'undefined') {
