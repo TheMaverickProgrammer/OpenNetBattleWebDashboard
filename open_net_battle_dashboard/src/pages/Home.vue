@@ -82,7 +82,7 @@
                     </b-card-group>
                     <!-- the dynamic form based on selection above -->
                     <b-collapse id="collapse-2" class="mt-2" v-model="showProxy">
-                        <component :is="formType"/>
+                        <component :is="getFormType"/>
                     </b-collapse>
                 </b-tab>
             </b-tabs>
@@ -102,23 +102,21 @@ export default {
         DeleteCardForm
     },
     computed: {
-        getUserAccount() { return this.userInfo; }
+        getUserAccount() { return this.userInfo; },
+        getFormType() { return this.formType; }
     },
     props: {
         show: {
             type: Boolean,
             default: false
-        },
-        formType: {
-            type: String,
-            default: "CardForm"
         }
     },
     data() {
         return {
             showProxy: this.show,
             userInfo: {},
-            changePassword: false
+            changePassword: false,
+            formType: "CardForm"
         }
     },
     methods: {

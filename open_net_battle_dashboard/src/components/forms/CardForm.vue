@@ -200,8 +200,6 @@ export default {
             this.$api.add.cardModel(copy).then((response)=>{
                 let payload = response.data;
 
-                this.$store.dispatch('cards/addCard', payload.data, {namespaced:true}); 
-
                 let alert = { message: "New card '" + payload.data.name + "' added!", type:"success"};
                 this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
                 this.onReset();
@@ -209,11 +207,9 @@ export default {
                 let payload = err;
                 let message = "Unknown error";
 
-                if(typeof payload.response.data !== 'undefined') {
-                    message = payload.response.data.error.message;
-                }else if(typeof payload.response !== 'undefined') {
-                    if(payload.response.data.length > 0) {
-                        message = payload.response.data;
+                if(typeof payload.response !== 'undefined') {
+                    if(typeof payload.response.data !== 'undefined') {
+                        message = payload.response.data.error.message;
                     } else {
                         message = "Response: " + payload.response.statusText;
                     }

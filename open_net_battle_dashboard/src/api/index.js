@@ -194,6 +194,13 @@ const api = {
         }
     },
     delete: {
+        card(id) {
+            return axios.delete(resources.CARDS + "/" + id,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
         cardModel(id) {
             return axios.delete(resources.CARD_MODELS + "/" + id,
                 {

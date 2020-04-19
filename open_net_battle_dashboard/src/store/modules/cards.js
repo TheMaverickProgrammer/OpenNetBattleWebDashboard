@@ -15,6 +15,18 @@ export const cards = {
 
                 return card || nocard;
             }
+        },
+        getCardsByModelId: (state) => {
+            return (id) => {
+                let cards = state.list.filter( card => card.modelId == id) 
+                let nocard = { 
+                    name: "-", image: "", code: "-", codeFamily: [],
+                    element: "-", secondaryElement: "-", damage: 0,
+                    description: "N/A", verboseDescription: "N/A"
+                };
+
+                return cards.length>0? cards : [nocard];
+            }
         }
     },
     mutations: {

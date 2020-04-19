@@ -107,7 +107,4 @@ export default {
 .folder-card {
     filter: drop-shadow(8px 8px 5px rgba(0,0,0,0.25));
 }
-.folder-card:hover {
-    filter: drop-shadow(4px 4px 5px rgba(0,0,0,0.25));
-}
 </style>

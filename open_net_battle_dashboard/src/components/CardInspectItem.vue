@@ -7,9 +7,9 @@
         header-text-variant="light">
         <template v-slot:header v-if="!!card">
             {{ card.name }}&nbsp;
-            <b-badge id="card-id-badge" variant="light">
+            <b-badge id="card-id-badge" variant="light" v-if="!noid">
                 <b-tooltip target="card-id-badge" variant="light">
-                    <p class="cardId">{{ card.id }}</p>
+                    <p class="cardId">{{ typeof card.id !== 'undefined'?card.id:"Unavailable" }}</p>
                 </b-tooltip>
                 id
             </b-badge>

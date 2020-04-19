@@ -24,6 +24,9 @@ export default {
     created() {
         this.fetch();
     },
+    activated() {
+        this.fetch()
+    },
     computed: {
       ...mapGetters('cards', ['getCardById'])  
     },
