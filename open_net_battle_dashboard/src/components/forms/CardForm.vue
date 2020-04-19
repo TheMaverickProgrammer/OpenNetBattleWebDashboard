@@ -198,9 +198,11 @@ export default {
             delete copy.codeFamily;
 
             this.$api.add.cardModel(copy).then((response)=>{
-                this.$store.dispatch('cards/addCard', response.data, {namespaced:true}); 
+                let payload = response.data;
 
-                let alert = { message: "New card '" + response.data.name + "' added!", type:"success"};
+                this.$store.dispatch('cards/addCard', payload.data, {namespaced:true}); 
+
+                let alert = { message: "New card '" + payload.data.name + "' added!", type:"success"};
                 this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
                 this.onReset();
             }).catch(err => {

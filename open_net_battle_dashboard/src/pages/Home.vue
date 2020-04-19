@@ -3,7 +3,12 @@
         <div>
             <b-tabs nav-item-class="theme-color">
                 <b-tab title="News" active>
-                    <b-card style='text-align:left'>
+                    <b-card style='text-align:left' scrollable>
+                        <h2>4/18/2020 New content and bugfixes</h2>
+                        <p> 
+                            You don't need to toggle <code>Change Password</code> anymore to update your user settings<br/>
+                            Added Roll v1-v3 chips. They work in game! 
+                        </p>
                         <h2>4/10/2020 Dashboard Launch! 🥳</h2>
                         <p>
                             I'm really stoked to have this dashboard functional.<br/>
@@ -52,7 +57,7 @@
                             <b-button-group vertical>
                                 <b-button variant="success" @click="handleCreateCard">Create</b-button>
                                 <b-button variant="warning">Edit</b-button>
-                                <b-button variant="danger">Delete</b-button>
+                                <b-button variant="danger" @click="handleDeleteCard">Delete</b-button>
                             </b-button-group>
                         </b-card>
                         <b-card>
@@ -88,11 +93,13 @@
 <script>
 import CardForm from '@/components/forms/CardForm'
 import UserForm from '@/components/forms/UserForm'
+import DeleteCardForm from '@/components/forms/DeleteCardForm'
 
 export default {
     components: {
         CardForm,
-        UserForm
+        UserForm,
+        DeleteCardForm
     },
     computed: {
         getUserAccount() { return this.userInfo; }
@@ -119,15 +126,23 @@ export default {
             this.formType = "CardForm"; // using Vue component tag to render form types dynamically
             this.showProxy = true;
         },
+        handleDeleteCard() {
+            this.formType = "DeleteCardForm"; // using Vue component tag to render form types dynamically
+            this.showProxy = true;
+        },
         handleUserUpdate(user, confirmPassword) {
-            if(confirmPassword.length == 0 || user.password.length == 0)  {
-                let alert = {message: "Enter both password fields", type: "danger", title: "Choose a password"};
-                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-                return;
-            } else if(user.password != confirmPassword) {
-                let alert = {message: "Passwords did not match", type: "danger", title: "WRITE IT DOWN SOMEWHERE"};
-                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-                return;
+            if(this.changePassword) {
+                if(confirmPassword.length == 0 || user.password.length == 0)  {
+                    let alert = {message: "Enter both password fields", type: "danger", title: "Choose a password"};
+                    this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+                    return;
+                } else if(user.password != confirmPassword) {
+                    let alert = {message: "Passwords did not match", type: "danger", title: "WRITE IT DOWN SOMEWHERE"};
+                    this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+                    return;
+                }
+            } else {
+                delete user.password; // do not send this over
             }
 
             user.id = this.$store.state.user.userId;
