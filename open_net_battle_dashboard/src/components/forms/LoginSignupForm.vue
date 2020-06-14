@@ -21,7 +21,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="person-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Username" id="form-name" :disabled="busy" v-model="user.username"></b-form-input>
+              <b-form-input required placeholder="Username" id="form-name" :disabled="busy" v-model="user.username"></b-form-input>
             </b-input-group>
           </b-form-group>
           <b-form-group label-for="form-password" label-cols-lg="2">
@@ -29,7 +29,7 @@
               <b-input-group-prepend is-text>
                 <b-icon icon="lock-fill"></b-icon>
               </b-input-group-prepend>
-              <b-form-input placeholder="Password" id="form-password" type="password" :disabled="busy" v-model="user.password"></b-form-input>
+              <b-form-input required placeholder="Password" id="form-password" type="password" :disabled="busy" v-model="user.password"></b-form-input>
             </b-input-group>
           </b-form-group>
           <div class="d-flex justify-content-center">
@@ -106,7 +106,13 @@ export default {
             }
         },
         autoLogin() {
-          this.handleLoginAction(null, true);
+          // Chrome prompts an Auth box if the login fails
+          // So as a kind of a hack, we just check if we have a session active
+          // before sending any credentials over to the server.
+          // This prevents chrome from opening prompts we don't want
+          if(localStorage.getItem('obnSessionActive')) {
+            this.handleLoginAction(null, true);
+          }
         },
         handleLoginAction(evt, autoLogin) {
           this.busy = true;

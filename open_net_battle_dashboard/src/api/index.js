@@ -23,7 +23,9 @@ const api = {
                     cancelToken: cancelToken || null,
                     withCredentials: true,
                     auth: { username: username, password: password },
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: { 
+                        'Content-Type': 'application/json',
+                    },
                 })
         },
         logout() {

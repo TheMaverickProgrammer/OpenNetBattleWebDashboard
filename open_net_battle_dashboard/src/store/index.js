@@ -29,6 +29,8 @@ export default new Vuex.Store({
     actions: {
         loginUser(context, user) {
             context.commit('doSetUser', user);
+            localStorage.setItem('obnSessionActive', true);
+
         },
         setUser(context, user) {
             if(typeof user.userId === 'undefined' && user._id) {
@@ -37,6 +39,7 @@ export default new Vuex.Store({
             }
             
             context.commit('doSetUser', user);
+            localStorage.setItem('obnSessionActive', true);
         },
         logoutUser(context) {
             let user = {
@@ -48,6 +51,7 @@ export default new Vuex.Store({
             };
 
             context.commit('doSetUser', user);
+            localStorage.removeItem('obnSessionActive');
 
             this.dispatch('folders/clearFolders', { namespaced: true});
             this.dispatch('publicFolders/clearFolders', { namespace: true});
