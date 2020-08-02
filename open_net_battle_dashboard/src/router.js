@@ -5,6 +5,7 @@ import FolderListPage from '@/pages/FolderListPage'
 import FolderEditPage from '@/pages/FolderEditPage'
 import FolderAddFromLibraryPage from '@/pages/FolderAddFromLibraryPage'
 import PublicFolderListPage from '@/pages/PublicFolderListPage'
+import ComboListPage from '@/pages/ComboListPage'
 import CardLibraryViewPage from '@/pages/CardLibraryViewPage'
 import CodeEditPage from '@/pages/CodeEditPage'
 
@@ -89,6 +90,17 @@ export default new Router({
         breadcrumb: [
             { name: 'Home', link: '/'},
             { name: 'Public Folders' }
+            ]
+        }
+    },
+    {
+        path: '/combos',
+        name: 'ComboListPage',
+        component: ComboListPage,
+        meta: {
+        breadcrumb: [
+            { name: 'Home', link: '/'},
+            { name: 'Combos' }
             ]
         }
     }

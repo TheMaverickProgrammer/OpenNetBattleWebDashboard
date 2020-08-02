@@ -13,9 +13,10 @@
                 </b-tooltip>
                 id
             </b-badge>
+            Lim {{ card.limit }}
         </template>
 
-        <b-container fluid v-if="!!card">
+        <b-container fluid v-if="!!card" :class="getClass(card)">
             <b-row>
                 <img :src="card.image" width="112px" height="96px" class="image"/> 
             </b-row>
@@ -27,12 +28,16 @@
                 <b-col cols="2" class="left-aligned"> 
                     <Element :type="card.element? card.element : 'None'"/>
                 </b-col>
-                <b-col cols="8" class="damage">
+                <b-col cols="6" class="damage">
                     {{ (card.damage > 0)? card.damage : '-' }}
+                </b-col>
+                <b-col cols="2" v-if="card.timeFreeze"> 
+                    <b-icon icon="clock" alt="Time Freeze"/>
                 </b-col>
             </b-row>
             <b-row>
                 <b-textarea disabled :value="getCardDescription"/>
+                <a href="#">MetaClasses</a>
             </b-row>
         </b-container>
     </b-card>
@@ -71,6 +76,21 @@ export default {
         }
     },
     methods: {
+        getClass(card) {
+            switch(card.class) {
+                case 1:
+                    return "regular";
+                case 2:
+                    return "mega";
+                case 3:
+                    return "giga";
+                case 4: 
+                    return "dark";
+                default:
+                    return "regular";
+            }
+        },
+
         convertLineBreakToHTML(string) {
             if(!string) return string;
             return string.replace(/\\n/g, '\n')
@@ -80,6 +100,32 @@ export default {
 </script>
 
 <style scoped>
+/** 
+Card Classes/Ranks
+ */
+.regular {
+    background-color: white !important;
+    color: black !important;
+}
+
+.mega {
+    background-color: aqua !important;
+    color: black !important;
+}
+
+.giga {
+    background-color: pink !important;
+    color: black !important;
+}
+
+.dark {
+    background-color: darkslateblue !important;
+    color: white !important;
+}
+
+/**
+Element stylings
+ */
 .cardId {
     font-size:small;
 }

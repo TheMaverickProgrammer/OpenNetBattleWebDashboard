@@ -37,7 +37,7 @@
 
       <!-- A custom formatted column -->
       <template v-slot:cell(icon)="data">
-        <img :src="data.value"/>
+        <img :src="data.value" class="icon pixel-perfect"/>
       </template>
 
       <!-- A custom formatted column -->
@@ -239,4 +239,10 @@ a {
 .selectionQueue {
   margin-top: 10px;
 }
+
+.icon {
+  width: 28px;
+  height: 28px;
+}
+
 </style>

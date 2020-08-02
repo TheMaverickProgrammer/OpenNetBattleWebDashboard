@@ -12,7 +12,8 @@ const resources = {
     USERS: base_url + "/users",
     FOLDERS: base_url + "/folders",
     PUBLIC_FOLDERS: base_url + '/public-folders',
-    CARD_MODELS: base_url + '/card-models',
+    CARD_MODELS: base_url + '/card-properties',
+    COMBOS: base_url + '/combos'
 }
 
 const api = {
@@ -72,6 +73,13 @@ const api = {
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
+        combo(id) {
+            return axios.get(resources.COMBOS + "/" + id, 
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
         /* 
         API uses time to fetch real-time updates
         Use `milli = 0` to fetch all resources of type
@@ -107,6 +115,14 @@ const api = {
                     withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
+        },
+        combosAfterDate(milli, cancelToken) {
+            return axios.get(resources.COMBOS + "/since/" + Math.floor(milli/1000),
+                {
+                    cancelToken: cancelToken || null,
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
         }
     },
     add: {
@@ -137,6 +153,14 @@ const api = {
         user(user) {
             return axios.post(resources.USERS,
                 user,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        combo(combo) {
+            return axios.post(resources.COMBOS,
+                combo,
                 {
                     withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
@@ -193,6 +217,18 @@ const api = {
                     withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
+        },
+        combo(combo) {
+            let id = combo.id;
+            let copy = {...combo};
+            delete copy.id;
+
+            return axios.put(resources.COMBOS + "/" + id,
+                copy,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
         }
     },
     delete: {
@@ -226,6 +262,13 @@ const api = {
         },
         publicFolder(id) {
             return axios.delete(resources.PUBLIC_FOLDERS + "/" + id,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        combo(id) {
+            return axios.delete(resources.COMBOS + "/" + id,
                 {
                     withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },

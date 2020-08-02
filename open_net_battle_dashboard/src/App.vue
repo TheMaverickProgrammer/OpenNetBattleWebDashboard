@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      keepAliveList: ['FolderListPage','PublicFolderListPage','CardLibraryViewPage', 'FolderAddFromLibraryPage']
+      keepAliveList: ['FolderListPage','PublicFolderListPage','CardLibraryViewPage', 'FolderAddFromLibraryPage', 'ComboListPage']
     }
   },
   methods: {
@@ -103,6 +103,14 @@ span.element_icons {
   display: inline-block;
   transform: scale(2);
 
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;          /* Firefox */
+  image-rendering: -o-crisp-edges;            /* Opera */
+  image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming)*/
+  -ms-interpolation-mode: nearest-neighbor;   /* IE (non-standard property) */
+}
+
+.pixel-perfect {
   image-rendering: crisp-edges;
   image-rendering: -moz-crisp-edges;          /* Firefox */
   image-rendering: -o-crisp-edges;            /* Opera */

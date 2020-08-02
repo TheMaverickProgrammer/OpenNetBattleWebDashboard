@@ -49,8 +49,7 @@
 
                     <b-form-group id="input-group-4">
                         <b-form-checkbox-group>
-                            <b-form-checkbox value="isTFC">TFC</b-form-checkbox>
-                            <b-form-checkbox value="isAttackModifier">Attack modifier</b-form-checkbox>
+                            <b-form-checkbox value="isTFC">TimeFreeze</b-form-checkbox>
                         </b-form-checkbox-group>
                     </b-form-group>
             </b-col>
@@ -140,6 +139,51 @@
                 </b-form-group>
                 
                 <b-form-group 
+                    id="input-group-11" 
+                    label="Action:" 
+                    label-for="input-11"
+                    description="Invoke animation"
+                    >
+                    <b-form-select
+                    id="input-11"
+                    v-model="preview.action"
+                    required
+                    :options="['Idle','Shoot', 'Swing', 'Hit', 'Throw']"
+                    :selected="'Idle'"
+                    ></b-form-select>
+                </b-form-group>
+
+                <b-form-group 
+                    id="input-group-12" 
+                    label="Class:" 
+                    label-for="input-12"
+                    description="Rank of card"
+                    >
+                    <b-form-select
+                    id="input-12"
+                    v-model="preview.class"
+                    required
+                    :options="['Standard','Mega', 'Giga', 'Dark']"
+                    :selected="'Standard'"
+                    ></b-form-select>
+                </b-form-group>
+
+                <b-form-group 
+                        id="input-group-13" 
+                        label="Limit" 
+                        label-for="input-13"
+                        description="Min of 1"
+                        >
+                        <b-form-input
+                        :formatter="limitFormatter"
+                        id="input-13"
+                        v-model="preview.limit"
+                        required
+                        type="number"
+                        ></b-form-input>
+                    </b-form-group>
+
+                <b-form-group 
                     description="Click to open script editor for card">
                     <b-button variant="dark">
                         <b-icon-code-slash @click="handleEditCode"/>
@@ -184,7 +228,8 @@ export default {
             preview: { 
                 element: 'None', secondaryElement: 'None', name: 'Unnamed', damage: 0, 
                 description: 'No desc given', verboseDescription: 'No description given',
-                image: '', icon: '', code: 'A', codeFamily: [], id: "Not Registered"
+                image: '', icon: '', code: 'A', codeFamily: [], id: "Not Registered",
+                limit: 0, action: '', class: 1, metaClasses: [], canBoost: false, timeFreeze: true
             },
             codeFamilyString: "A"
         }
@@ -196,6 +241,11 @@ export default {
             let copy = Object.assign({}, this.preview);
             copy.codes = copy.codeFamily;
             delete copy.codeFamily;
+
+            if(copy.class == "Standard") copy.class = 1;
+            if(copy.class == "Mega") copy.class = 2;
+            if(copy.class == "Giga") copy.class = 3;
+            if(copy.class == "Dark") copy.class = 4;
 
             this.$api.add.cardModel(copy).then((response)=>{
                 let payload = response.data;
@@ -230,7 +280,8 @@ export default {
             this.preview = { 
                 element: 'None', secondaryElement: 'None', name: 'Unnamed', damage: 0, 
                 description: 'No desc given', verboseDescription: 'No description given',
-                image: '', icon: '', code: 'A', codeFamily: "A"
+                image: '', icon: '', code: 'A', codeFamily: [], id: "Not Registered",
+                limit: 0, action: '', class: 1, metaClasses: [], canBoost: false, timeFreeze: true
             }
         },
         nameFormatter(value) {
@@ -241,6 +292,11 @@ export default {
             value = Number(value);
             if(value < 0) value = 0;
             if(value > 9999) value = 9999;
+            return value;
+        },
+        limitFormatter(value) {
+            value = Number(value);
+            if(value < 1) value = 1;
             return value;
         },
         handleEditCode(evt) {

@@ -1,9 +1,11 @@
 <template>
     <b-modal centered hide-footer
-        ref="card-view-modal"  size="sm" 
+        ref="card-view-modal"  
+        size="sm" 
         header-bg-variant="dark"
         header-text-variant="light"
         @hide="handleHidden">
+
         <template v-slot:modal-title v-if="!!card">
             {{ card.name }}&nbsp;
             <b-badge id="card-id-badge" variant="light">
@@ -26,13 +28,18 @@
                     <Element :type="card.element"/>
                 </b-col>
                 <b-col cols="8" class="damage">
+                    <span v-if="card.timeFreeze"> 
+                        <b-icon icon="clock"/>
+                    </span>
                     {{ (card.damage > 0)? card.damage : '-' }}
                 </b-col>
             </b-row>
             <b-row>
                 <b-textarea disabled :value="getCardDescription"/>
+                <small>Limit {{ card.limit }} per folder</small>
             </b-row>
         </b-container>
+
         <b-button class="mt-2" variant="outline-danger" block @click="hideModal">Close</b-button>
     </b-modal>
 </template>
@@ -67,6 +74,10 @@ export default {
         show: {
             type: Boolean,
             default: false
+        },
+        meta: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -83,6 +94,23 @@ export default {
         }
     },
     methods: {
+        toggleMeta() {
+            this.meta = !this.meta;
+        },
+        getClass(card) {
+            switch(card.class) {
+                case 1:
+                    return "regular";
+                case 2:
+                    return "mega";
+                case 3:
+                    return "giga";
+                case 4: 
+                    return "dark";
+                default:
+                    return "regular";
+            }
+        },
         showModal() {
             this.showProxy = true;
             this.$refs['card-view-modal'].show();
@@ -104,6 +132,33 @@ export default {
 </script>
 
 <style scoped>
+/**
+Card Classes/Ranks
+*/
+.regular {
+    background-color: white !important;
+    color: black !important;
+}
+
+.mega {
+    background-color: aqua !important;
+    color: black !important;
+}
+
+.giga {
+    background-color: pink !important;
+    color: black !important;
+}
+
+.dark {
+    background-color: darkslateblue !important;
+    color: white !important;
+}
+
+/**
+Element stylings
+ */
+
 .cardId {
     font-size:small;
 }
@@ -114,6 +169,10 @@ export default {
 
 .left-aligned {
     padding-left: 0px;
+}
+
+.right-aligned {
+    padding-right: 0px;
 }
 
 .damage {
