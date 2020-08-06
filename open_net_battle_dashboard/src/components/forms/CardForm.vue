@@ -291,6 +291,7 @@ export default {
         limitFormatter(value) {
             value = Number(value);
             if(value < 1) value = 1;
+            if(value > 5) value = 5;
             return value;
         },
         handleEditCode(evt) {
