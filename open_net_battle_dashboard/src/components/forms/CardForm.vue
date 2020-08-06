@@ -28,6 +28,7 @@
                         <b-form-input
                         :formatter="damageFormatter"
                         id="input-2"
+                        step="5"
                         v-model="preview.damage"
                         required
                         type="number"
@@ -48,9 +49,7 @@
                     </b-form-group>
 
                     <b-form-group id="input-group-4">
-                        <b-form-checkbox-group>
-                            <b-form-checkbox value="isTFC">TimeFreeze</b-form-checkbox>
-                        </b-form-checkbox-group>
+                        <b-form-checkbox v-model="preview.timeFreeze">TimeFreeze</b-form-checkbox>
                     </b-form-group>
             </b-col>
             <b-col cols="2">
@@ -91,8 +90,7 @@
                     id="input-7"
                     v-model="preview.element"
                     required
-                    :options="['None','Fire','Electric','Wood','Aqua','Break','Plus','Summon','Cursor']"
-                    :selected="'None'"
+                    :options="['None','Fire','Electric','Wood','Aqua','Wind','Break','Plus','Summon','Cursor']"
                     ></b-form-select>
                 </b-form-group>
                 <b-form-group 
@@ -105,12 +103,56 @@
                     id="input-8"
                     v-model="preview.secondaryElement"
                     required
-                    :options="['None','Fire','Electric','Wood','Aqua','Break','Plus','Summon','Cursor']"
-                    :selected="'None'"
+                    :options="['None','Fire','Electric','Wood','Aqua','Wind','Break','Plus','Summon','Cursor']"
                     ></b-form-select>
                 </b-form-group>
             </b-col>
-            <b-col cols="4">
+            <b-col cols="2">               
+                <b-form-group 
+                    id="input-group-11" 
+                    label="Action:" 
+                    label-for="input-11"
+                    description="Invoke animation"
+                    >
+                    <b-form-select
+                    id="input-11"
+                    v-model="preview.action"
+                    required
+                    :options="['Idle','Shoot', 'Swing', 'Hit', 'Throw']"
+                    ></b-form-select>
+                </b-form-group>
+
+                <b-form-group 
+                    id="input-group-12" 
+                    label="Class:" 
+                    label-for="input-12"
+                    description="Rank of card"
+                    >
+                    <b-form-select
+                    id="input-12"
+                    v-model="preview.class"
+                    required
+                    :options="['Standard','Mega', 'Giga', 'Dark']"
+                    ></b-form-select>
+                </b-form-group>
+
+                <b-form-group 
+                        id="input-group-13" 
+                        label="Limit" 
+                        label-for="input-13"
+                        description="Min of 1"
+                        >
+                        <b-form-input
+                        :formatter="limitFormatter"
+                        id="input-13"
+                        v-model="preview.limit"
+                        required
+                        type="number"
+                        ></b-form-input>
+                    </b-form-group>
+
+            </b-col>
+            <b-col>
                 <b-form-group
                     id="input-group-9"
                     label="Description:"
@@ -137,61 +179,12 @@
                     required
                     ></b-form-textarea>
                 </b-form-group>
-                
-                <b-form-group 
-                    id="input-group-11" 
-                    label="Action:" 
-                    label-for="input-11"
-                    description="Invoke animation"
-                    >
-                    <b-form-select
-                    id="input-11"
-                    v-model="preview.action"
-                    required
-                    :options="['Idle','Shoot', 'Swing', 'Hit', 'Throw']"
-                    :selected="'Idle'"
-                    ></b-form-select>
-                </b-form-group>
-
-                <b-form-group 
-                    id="input-group-12" 
-                    label="Class:" 
-                    label-for="input-12"
-                    description="Rank of card"
-                    >
-                    <b-form-select
-                    id="input-12"
-                    v-model="preview.class"
-                    required
-                    :options="['Standard','Mega', 'Giga', 'Dark']"
-                    :selected="'Standard'"
-                    ></b-form-select>
-                </b-form-group>
-
-                <b-form-group 
-                        id="input-group-13" 
-                        label="Limit" 
-                        label-for="input-13"
-                        description="Min of 1"
-                        >
-                        <b-form-input
-                        :formatter="limitFormatter"
-                        id="input-13"
-                        v-model="preview.limit"
-                        required
-                        type="number"
-                        ></b-form-input>
-                    </b-form-group>
-
-                <b-form-group 
-                    description="Click to open script editor for card">
-                    <b-button variant="dark">
-                        <b-icon-code-slash @click="handleEditCode"/>
-                    </b-button>
-                </b-form-group>
 
                 <!-- Form buttons go here b/c it looks better -->
                 <b-button-group>
+                    <b-button variant="dark">
+                        <b-icon-code-slash @click="handleEditCode"/>
+                    </b-button>
                     <b-button type="submit" variant="info">Submit</b-button>
                     <b-button type="reset" variant="danger">Reset</b-button>
                 </b-button-group>
@@ -225,12 +218,7 @@ export default {
     },
     data() {
         return {
-            preview: { 
-                element: 'None', secondaryElement: 'None', name: 'Unnamed', damage: 0, 
-                description: 'No desc given', verboseDescription: 'No description given',
-                image: '', icon: '', code: 'A', codeFamily: [], id: "Not Registered",
-                limit: 0, action: '', class: 1, metaClasses: [], canBoost: false, timeFreeze: true
-            },
+            preview: this.newPreview(),
             codeFamilyString: "A"
         }
     },
@@ -277,12 +265,17 @@ export default {
         onReset(evt) {
             evt? evt.preventDefault() : 0;
             // Reset our form values
-            this.preview = { 
+            this.preview = this.newPreview();
+        },
+        newPreview() {
+            let preview = { 
                 element: 'None', secondaryElement: 'None', name: 'Unnamed', damage: 0, 
                 description: 'No desc given', verboseDescription: 'No description given',
                 image: '', icon: '', code: 'A', codeFamily: [], id: "Not Registered",
-                limit: 0, action: '', class: 1, metaClasses: [], canBoost: false, timeFreeze: true
-            }
+                limit: 1, action: 'Shoot', class: "Standard", metaClasses: [], canBoost: false, timeFreeze: false
+            };
+
+            return preview;
         },
         nameFormatter(value) {
             let max = value.length < 8? value.length : 8;
@@ -290,6 +283,7 @@ export default {
         },
         damageFormatter(value) {
             value = Number(value);
+            value = value - (value%5); // damage is intervals of 5 units
             if(value < 0) value = 0;
             if(value > 9999) value = 9999;
             return value;

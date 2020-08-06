@@ -67,7 +67,7 @@
 
       <!-- A custom formatted column -->
       <template v-slot:cell(name)="data">
-        <a href="#" @click="showModal(data.item)">{{data.value}}</a>
+        <a href="#" :class="getAnchorCSSClass(data.item.class)" @click="showModal(data.item)">{{data.value}}</a>
       </template>
 
       <!-- A custom formatted column -->
@@ -162,57 +162,71 @@ export default {
       }
     },
     data() {
-        let fields = [
-          { key: 'image', sortable: false },
-          { key: 'icon', sortable: false },
-          { key: 'name', sortable: true },
-          { key: 'damage', sortable: true },
-          { key: 'code', sortable: true },
-          { key: 'element', sortable: true},
-          { key: 'secondaryElement', label: '2nd Element', sortable: true },
-          { key: 'description', sortable: false },
-          { key: 'verboseDescription', sortable: false}
-        ];
+      let fields = [
+        { key: 'image', sortable: false },
+        { key: 'icon', sortable: false },
+        { key: 'name', sortable: true },
+        { key: 'damage', sortable: true },
+        { key: 'code', sortable: true },
+        { key: 'element', sortable: true},
+        { key: 'secondaryElement', label: '2nd Element', sortable: true },
+        { key: 'description', sortable: false },
+        { key: 'verboseDescription', sortable: false}
+      ];
 
-        if(this.removable) {
-          fields = [ 'actions', ...fields];
-        }
+      if(this.removable) {
+        fields = [ 'actions', ...fields];
+      }
 
-        return {
-            preview: { name: "" },
-            fields: fields,
-            selectMode: 'multi',
-            selected: [],
-            perPage: 20,
-            currentPage: 1,
-            rows: 0,
-            inspectCard: null
-        }
+      return {
+        preview: { name: "" },
+        fields: fields,
+        selectMode: 'multi',
+        selected: [],
+        perPage: 20,
+        currentPage: 1,
+        rows: 0,
+        inspectCard: null
+      }
+  },
+  methods: {
+    onRowSelected(items) {
+      this.selected = items;
     },
-    methods: {
-        onRowSelected(items) {
-            this.selected = items;
-        },
-        selectAllRows() {
-            this.$refs.selectableTable.selectAllRows()
-        },
-        clearSelected() {
-            this.$refs.selectableTable.clearSelected()
-        },
-        showModal(card) {
-            this.inspectCard = card;
-        },
-        getPreview() {
-            return this.preview;
-        },
-        handleSubmit() {
-            this.$emit('submit-cards', this.selected);
-            this.clearSelected();
-        },
-        handleHiddenModal(){
-          this.inspectCard = null;
-        }
+    selectAllRows() {
+      this.$refs.selectableTable.selectAllRows()
+    },
+    clearSelected() {
+      this.$refs.selectableTable.clearSelected()
+    },
+    showModal(card) {
+      this.inspectCard = card;
+    },
+    getPreview() {
+      return this.preview;
+    },
+    handleSubmit() {
+      this.$emit('submit-cards', this.selected);
+      this.clearSelected();
+    },
+    handleHiddenModal() {
+      this.inspectCard = null;
+    },
+    getAnchorCSSClass(classNum) {
+      switch(classNum) {
+        case 1:
+          return "StandardText";
+        case 2:
+          return "MegaText";
+        case 3:
+          return "GigaText";
+        case 4: 
+          return "DarkText";
+        default:
+          return "StandardText";
+      }
     }
+  }
 }
 </script>
 
@@ -230,10 +244,6 @@ export default {
   border-width: 5px;
   border-style:inset;
   margin-bottom:-10px;;
-}
-
-a {
-  color: #17a2b8 !important;
 }
 
 .selectionQueue {

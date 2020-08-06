@@ -1,4 +1,8 @@
-<!-- Very similar to CardInspectModal except is a card component that does not show/hide -->
+<!-- 
+    Very similar to CardInspectModal except is a card component that does not show/hide 
+    This is used in the card creation and edit forms.
+    Use modal for popups and previews.
+-->
 
 <template>
     <b-card centered hide-footer
@@ -6,6 +10,7 @@
         header-bg-variant="dark"
         header-text-variant="light">
         <template v-slot:header v-if="!!card">
+            <img :src="card.icon" class="card-inspect-icon" v-if="card.icon.length"/>
             {{ card.name }}&nbsp;
             <b-badge id="card-id-badge" variant="light" v-if="!noid">
                 <b-tooltip target="card-id-badge" variant="light">
@@ -13,10 +18,9 @@
                 </b-tooltip>
                 id
             </b-badge>
-            Lim {{ card.limit }}
         </template>
 
-        <b-container fluid v-if="!!card" :class="getClass(card)">
+        <b-container fluid v-if="!!card" :class="[card.class, 'cardContainer']">
             <b-row>
                 <img :src="card.image" width="112px" height="96px" class="image"/> 
             </b-row>
@@ -28,16 +32,16 @@
                 <b-col cols="2" class="left-aligned"> 
                     <Element :type="card.element? card.element : 'None'"/>
                 </b-col>
-                <b-col cols="6" class="damage">
+                <b-col cols="8" class="damage">
+                    <span v-if="card.timeFreeze"> 
+                        <b-icon icon="clock"/>
+                    </span>
                     {{ (card.damage > 0)? card.damage : '-' }}
-                </b-col>
-                <b-col cols="2" v-if="card.timeFreeze"> 
-                    <b-icon icon="clock" alt="Time Freeze"/>
                 </b-col>
             </b-row>
             <b-row>
                 <b-textarea disabled :value="getCardDescription"/>
-                <a href="#">MetaClasses</a>
+                <small>Lim {{ card.limit }} per folder </small>
             </b-row>
         </b-container>
     </b-card>
@@ -78,16 +82,16 @@ export default {
     methods: {
         getClass(card) {
             switch(card.class) {
-                case 1:
-                    return "regular";
-                case 2:
-                    return "mega";
-                case 3:
-                    return "giga";
-                case 4: 
-                    return "dark";
+                case "Standard":
+                    return 1;
+                case "Mega":
+                    return 2;
+                case "Giga":
+                    return 3;
+                case "Dark": 
+                    return 4;
                 default:
-                    return "regular";
+                    return 1;
             }
         },
 
@@ -100,29 +104,6 @@ export default {
 </script>
 
 <style scoped>
-/** 
-Card Classes/Ranks
- */
-.regular {
-    background-color: white !important;
-    color: black !important;
-}
-
-.mega {
-    background-color: aqua !important;
-    color: black !important;
-}
-
-.giga {
-    background-color: pink !important;
-    color: black !important;
-}
-
-.dark {
-    background-color: darkslateblue !important;
-    color: white !important;
-}
-
 /**
 Element stylings
  */

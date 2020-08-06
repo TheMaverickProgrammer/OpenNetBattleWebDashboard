@@ -1,3 +1,8 @@
+<!-- 
+    Very similar to CardInspectItem except is a card component that pops up as a modal
+    This is used to inspect real card data.
+    Use Item for forms.
+-->
 <template>
     <b-modal centered hide-footer
         ref="card-view-modal"  
@@ -7,6 +12,7 @@
         @hide="handleHidden">
 
         <template v-slot:modal-title v-if="!!card">
+            <img :src="card.icon" class="card-inspect-icon"/>
             {{ card.name }}&nbsp;
             <b-badge id="card-id-badge" variant="light">
                 <b-tooltip target="card-id-badge" variant="light">
@@ -16,7 +22,7 @@
             </b-badge>
         </template>
 
-        <b-container fluid v-if="!!card">
+        <b-container fluid v-if="!!card" :class="[getClass(card), 'cardContainer']">
             <b-row>
                 <img :src="card.image" width="112px" height="96px" class="image"/> 
             </b-row>
@@ -100,15 +106,15 @@ export default {
         getClass(card) {
             switch(card.class) {
                 case 1:
-                    return "regular";
+                    return "Standard";
                 case 2:
-                    return "mega";
+                    return "Mega";
                 case 3:
-                    return "giga";
+                    return "Giga";
                 case 4: 
-                    return "dark";
+                    return "Dark";
                 default:
-                    return "regular";
+                    return "Standard";
             }
         },
         showModal() {
@@ -132,29 +138,6 @@ export default {
 </script>
 
 <style scoped>
-/**
-Card Classes/Ranks
-*/
-.regular {
-    background-color: white !important;
-    color: black !important;
-}
-
-.mega {
-    background-color: aqua !important;
-    color: black !important;
-}
-
-.giga {
-    background-color: pink !important;
-    color: black !important;
-}
-
-.dark {
-    background-color: darkslateblue !important;
-    color: white !important;
-}
-
 /**
 Element stylings
  */
