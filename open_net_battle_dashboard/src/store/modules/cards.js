@@ -22,6 +22,7 @@ export const cards = {
             return (id) => {
                 let cards = state.list.filter( card => card.modelId == id) 
                 let nocard = { 
+                    id:null,
                     name: "-", image: "", code: "-", codeFamily: [],
                     element: "-", secondaryElement: "-", damage: 0,
                     description: "N/A", verboseDescription: "N/A",
@@ -61,6 +62,28 @@ export const cards = {
                 state.list = [card, ...state.list];
             }
         },
+        doUpdateCardsByModel(state, model) {
+            // Don't track duplicates
+            let cards = state.list.filter( cardItem => cardItem.modelId == model.id);
+
+            for(let i = 0; i < cards.length; i++) {
+                let card = cards[i];
+                card.name = model.name;
+                card.codeFamily = model.codes;
+                card.image = model.image;
+                card.icon = model.icon;
+                card.element = model.element;
+                card.secondaryElement = model.secondaryElement;
+                card.damage = model.damage;
+                card.description = model.description;
+                card.verboseDescription = model.verboseDescription;
+                card.class = model.class;
+                card.limit = model.limit;
+                card.action = model.action;
+                card.timeFreeze = model.timeFreeze;
+                card.canBoost = model.canBoost;
+            }
+        },
         doRemoveCard(state, cardIndex) {
             state.list.splice(cardIndex, 1);
         },
@@ -71,6 +94,9 @@ export const cards = {
     actions: {
         addCard(context, card) {
             context.commit('doAddCard', card);
+        },
+        updateCardsByModel(context, model) {
+            context.commit('doUpdateCardsByModel', model);
         },
         removeCard(context, index) {
             context.commit('doRemoveCard', index);

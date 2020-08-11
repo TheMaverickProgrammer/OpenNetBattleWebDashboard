@@ -40,6 +40,7 @@ export default {
             this.$api.prefetchFolderById(folderId, folder=>{
                 for(let id of folder.cards) {
                     this.$api.prefetchCardById(id, card=>{
+                        card.id = id;
                         this.cards = [...this.cards, card];
                     });
                 }
@@ -78,6 +79,7 @@ export default {
                         let cardIdsOnly = [];
 
                         cards.forEach(card=> {
+                            console.log(card.name + " " + card.id);
                             cardIdsOnly = [...cardIdsOnly, card.id];
                         });
 

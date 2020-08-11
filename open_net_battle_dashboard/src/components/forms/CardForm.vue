@@ -2,6 +2,13 @@
   <div class="form-body">
     <b-form @submit="onSubmit" @reset="onReset">
         <b-row>
+            <b-col cols="4" v-if="isEditting">
+                <label>Choose a card to update from the system:</label><br/>
+                <b-form-select v-model="selected" :options="modelOptions" @change="handleSelectionChange" v-if="!isBusy"></b-form-select>
+                <b-spinner variant="primary" label="Spinning" v-if="isBusy"></b-spinner>
+            </b-col>
+        </b-row>
+        <b-row>
             <b-col cols="2">
                     <b-form-group
                         id="input-group-1"
@@ -185,7 +192,8 @@
                     <b-button variant="dark">
                         <b-icon-code-slash @click="handleEditCode"/>
                     </b-button>
-                    <b-button type="submit" variant="info">Submit</b-button>
+                    <b-button type="submit" variant="info" v-if="!isEditting">Submit</b-button>
+                    <b-button type="submit" variant="info" v-if="isEditting" >Edit</b-button>
                     <b-button type="reset" variant="danger">Reset</b-button>
                 </b-button-group>
             </b-col>
@@ -201,6 +209,7 @@
 
 <script>
 import CardInspectItem from '@/components/CardInspectItem'
+import { mapGetters } from 'vuex'
 
 export default {
     components: {
@@ -216,13 +225,58 @@ export default {
                 this.preview.code = '';
         }
     },
-    data() {
-        return {
-            preview: this.newPreview(),
-            codeFamilyString: "A"
+    props: {
+        card: {
+            type: Object,
+            default: null
+        },
+        isEditting: {
+            type: Boolean,
+            default: false
+        }
+    },
+    computed: {
+        ...mapGetters('cards', ['getCardById', 'getCardsByModelId']),
+        getSelectedPreview() {
+            let card = {} 
+            let ref = this.getCardsByModelId(this.selected)[0];
+
+            Object.assign(card, ref);
+
+            switch(card.class) {
+                case 2:
+                    card.class = "Mega";
+                    break;
+                case 3:
+                    card.class = "Giga";
+                    break;
+                case 4:
+                    card.class = "Dark";
+                    break;
+                default:
+                    card.class = "Standard";
+            }
+
+            return card;
+        },
+        modelOptions() {
+            let options = [];
+            this.$store.state.cards.list.forEach(card => {
+            options = [...options, {text: card.name, value: card.modelId}];
+            });
+            
+            options = options.filter((obj, pos, arr) => {
+            return arr.map(mapObj => mapObj['value']).indexOf(obj['value']) === pos;
+            });
+
+            return options;
         }
     },
     methods: {
+        handleSelectionChange() {
+            this.preview = this.getSelectedPreview;
+            this.codeFamilyString = this.preview.codeFamily.toString();
+        },
         onSubmit(evt) {
             evt.preventDefault();
 
@@ -235,7 +289,17 @@ export default {
             if(copy.class == "Giga") copy.class = 3;
             if(copy.class == "Dark") copy.class = 4;
 
-            this.$api.add.cardModel(copy).then((response)=>{
+            copy.id = copy.modelId;
+            delete copy.modelId;
+
+            if(this.isEditting) {
+                this.updateExistingCard(copy);
+            } else {
+                this.createNewCard(copy);
+            }
+        },
+        createNewCard(card) {
+            this.$api.add.cardModel(card).then((response)=>{
                 let payload = response.data;
 
                 let alert = { message: "New card '" + payload.data.name + "' added!", type:"success"};
@@ -262,10 +326,47 @@ export default {
                 this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
             });
         },
+        updateExistingCard(card) {
+            this.$api.update.cardModel(card).then(response=> {
+                let payload = response.data;
+                let cardModel = payload.data;
+                cardModel.id = cardModel._id;
+                delete cardModel._id;
+
+                this.$store.dispatch('cards/updateCardsByModel', cardModel, {namespace: true});
+                
+                let alert = { message: "Card '" + payload.data.name + "' was updated!", type:"success"};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+
+            }).catch(err=> {
+                let payload = err;
+                let message = "Unknown error";
+
+                if(typeof payload.response !== 'undefined') {
+                    if(typeof payload.response.data !== 'undefined') {
+                        message = payload.response.data.error.message;
+                    } else {
+                        message = "Response: " + payload.response.statusText;
+                    }
+                }else if(typeof payload.name !== 'undefined') {
+                    message = payload.message;
+                } // mongo specific error
+                else if(typeof payload.errmsg !== 'undefined') {
+                    message = payload.errmsg;
+                }
+
+                let alert = {message: message, type: "danger", title: "Failed to update card"};
+                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+            });
+        },
         onReset(evt) {
             evt? evt.preventDefault() : 0;
             // Reset our form values
             this.preview = this.newPreview();
+
+            if(this.isEditting) {
+                this.selected = null;
+            }
         },
         newPreview() {
             let preview = { 
@@ -296,8 +397,39 @@ export default {
         },
         handleEditCode(evt) {
             evt.preventDefault();
-            this.$router.push('/cards/0/edit/script');
+            this.$router.push('/cards/0/edit/script'); // TODO: somehow go to a unique endpoint?
+        },
+        fetch() {
+            this.isBusy = true;
+
+            // First time loading table get everything, then `updated` will be set to Date.now()
+            this.$api.get.cardsAfterDate(this.lastUpdated).then(response => {
+                let payload = response.data;
+
+                payload.data.forEach(async card => {
+                    await this.$api.prefetchCardById(card._id)
+                });
+            }).catch(err => {
+                let alert = { message: err, type: "danger", title: "Internal Error" };
+                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+            }).finally(()=> {
+                this.isBusy = false; // Done
+                this.lastUpdated = Date.now();
+            });
         }
+    },
+    data() {
+        return {
+            preview: this.newPreview(),
+            codeFamilyString: "A",
+            selected: null,
+            isMounted: false,
+            lastUpdated: 0,
+            isBusy: false
+        }
+    },
+    mounted() {
+      this.fetch();
     }
 }
 </script>
