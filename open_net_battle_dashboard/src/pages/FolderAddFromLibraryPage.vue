@@ -36,8 +36,22 @@ export default {
             let folderId = this.$route.params.id;
             let folder = this.getFolderById(folderId);
             let cardIdsOnly = [];
+            let cardLimitCounter = {};
 
             cards.forEach(card=> {
+                let counter = cardLimitCounter[card.id];
+
+                if(counter == null) {
+                    cardLimitCounter[card.id] = card.limit;
+                } else {
+                    cardLimitCounter = counter - 1;
+                }
+
+                if(cardLimitCounter[card.id] <= 0) {
+                    const alert = { message: "Card " + card.name + " duplicates over the limit of " + card.limit, type: 'danger' }
+                    this.$store.dispatch('alerts/addAlert', alert);
+                }
+
                 cardIdsOnly = [...cardIdsOnly, card.id];
             });
 

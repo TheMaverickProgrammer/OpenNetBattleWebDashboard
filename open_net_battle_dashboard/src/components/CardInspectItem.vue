@@ -1,4 +1,8 @@
-<!-- Very similar to CardInspectModal except is a card component that does not show/hide -->
+<!-- 
+    Very similar to CardInspectModal except is a card component that does not show/hide 
+    This is used in the card creation and edit forms.
+    Use modal for popups and previews.
+-->
 
 <template>
     <b-card centered hide-footer
@@ -6,6 +10,7 @@
         header-bg-variant="dark"
         header-text-variant="light">
         <template v-slot:header v-if="!!card">
+            <img :src="card.icon" class="card-inspect-icon" v-if="card.icon.length"/>
             {{ card.name }}&nbsp;
             <b-badge id="card-id-badge" variant="light" v-if="!noid">
                 <b-tooltip target="card-id-badge" variant="light">
@@ -15,7 +20,7 @@
             </b-badge>
         </template>
 
-        <b-container fluid v-if="!!card">
+        <b-container fluid v-if="!!card" :class="[card.class, 'cardContainer']">
             <b-row>
                 <img :src="card.image" width="112px" height="96px" class="image"/> 
             </b-row>
@@ -28,11 +33,15 @@
                     <Element :type="card.element? card.element : 'None'"/>
                 </b-col>
                 <b-col cols="8" class="damage">
+                    <span v-if="card.timeFreeze"> 
+                        <b-icon icon="clock"/>
+                    </span>
                     {{ (card.damage > 0)? card.damage : '-' }}
                 </b-col>
             </b-row>
             <b-row>
                 <b-textarea disabled :value="getCardDescription"/>
+                <small>Lim {{ card.limit }} per folder </small>
             </b-row>
         </b-container>
     </b-card>
@@ -71,6 +80,21 @@ export default {
         }
     },
     methods: {
+        getClass(card) {
+            switch(card.class) {
+                case "Standard":
+                    return 1;
+                case "Mega":
+                    return 2;
+                case "Giga":
+                    return 3;
+                case "Dark": 
+                    return 4;
+                default:
+                    return 1;
+            }
+        },
+
         convertLineBreakToHTML(string) {
             if(!string) return string;
             return string.replace(/\\n/g, '\n')
@@ -80,6 +104,9 @@ export default {
 </script>
 
 <style scoped>
+/**
+Element stylings
+ */
 .cardId {
     font-size:small;
 }

@@ -30,7 +30,7 @@ export default {
   },
   data() {
     return {
-      keepAliveList: ['FolderListPage','PublicFolderListPage','CardLibraryViewPage', 'FolderAddFromLibraryPage']
+      keepAliveList: ['FolderListPage','PublicFolderListPage','CardLibraryViewPage', 'FolderAddFromLibraryPage', 'ComboListPage']
     }
   },
   methods: {
@@ -102,7 +102,16 @@ span.element_icons {
   height: 14px;
   display: inline-block;
   transform: scale(2);
+  vertical-align: text-top;
 
+  image-rendering: crisp-edges;
+  image-rendering: -moz-crisp-edges;          /* Firefox */
+  image-rendering: -o-crisp-edges;            /* Opera */
+  image-rendering: -webkit-optimize-contrast; /* Webkit (non-standard naming)*/
+  -ms-interpolation-mode: nearest-neighbor;   /* IE (non-standard property) */
+}
+
+.pixel-perfect {
   image-rendering: crisp-edges;
   image-rendering: -moz-crisp-edges;          /* Firefox */
   image-rendering: -o-crisp-edges;            /* Opera */
@@ -121,4 +130,57 @@ span.element_icons.summon{background-position:-98px 0px;}
 span.element_icons.plus{background-position:-112px 0px;}
 span.element_icons.break{background-position:-126px 0px;}
 span.element_icons.none{background-position:-140px 0px;}
+
+/** 
+Card Classes/Ranks
+ */
+ .cardContainer {
+  padding: 10% !important;
+ }
+
+ .icon {
+   vertical-align: text-top;
+ }
+ 
+.card-inspect-icon {
+   width: 14px !important; 
+   height:14px !important;
+   vertical-align: initial !important;
+ }
+
+.Standard {
+  background-color: white !important;
+  color: black !important;
+}
+
+.Mega {
+  background-color: #ceffff !important;
+  color: black !important;
+}
+
+.Giga {
+  background-color: #fff1f3 !important;
+  color: black !important;
+}
+
+.Dark {
+  background-color: #775f8f !important;
+  color: white !important;
+}
+
+.StandardText {
+  color: black !important;
+}
+
+.MegaText {
+  color: #03c5c5 !important;
+}
+
+.GigaText {
+  color: #f45a70 !important;
+}
+
+.DarkText {
+  color: #8000ff !important;
+}
 </style>

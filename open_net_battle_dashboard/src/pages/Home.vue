@@ -56,8 +56,18 @@
                             </template>
                             <b-button-group vertical>
                                 <b-button variant="success" @click="handleCreateCard">Create</b-button>
-                                <b-button variant="warning">Edit</b-button>
+                                <b-button variant="warning" @click="handleUpdateCard">Edit</b-button>
                                 <b-button variant="danger" @click="handleDeleteCard">Delete</b-button>
+                            </b-button-group>
+                        </b-card>
+                        <b-card>
+                            <template v-slot:header>
+                                <b-icon-controller/>Combo
+                            </template>
+                            <b-button-group vertical>
+                                <b-button variant="success" @click="handleCreateCombo">Create</b-button>
+                                <b-button variant="warning">Edit</b-button>
+                                <b-button variant="danger" @click="handleDeleteCombo">Delete</b-button>
                             </b-button-group>
                         </b-card>
                         <b-card>
@@ -65,8 +75,8 @@
                                 <b-icon-person/>User
                             </template>
                             <b-button-group vertical>
-                                <b-button variant="warning">Edit</b-button>
-                                <b-button variant="danger">Delete</b-button>
+                                <b-button variant="warning" disabled>Edit</b-button>
+                                <b-button variant="danger" disabled>Delete</b-button>
                             </b-button-group>
                         </b-card>
                         <b-card>
@@ -82,7 +92,7 @@
                     </b-card-group>
                     <!-- the dynamic form based on selection above -->
                     <b-collapse id="collapse-2" class="mt-2" v-model="showProxy">
-                        <component :is="getFormType"/>
+                        <component :is="getFormType" v-bind="getFormProps" ref="formObj"/>
                     </b-collapse>
                 </b-tab>
             </b-tabs>
@@ -92,18 +102,26 @@
 
 <script>
 import CardForm from '@/components/forms/CardForm'
+import ComboForm from '@/components/forms/ComboForm'
 import UserForm from '@/components/forms/UserForm'
 import DeleteCardForm from '@/components/forms/DeleteCardForm'
 
 export default {
     components: {
         CardForm,
+        ComboForm,
         UserForm,
         DeleteCardForm
     },
     computed: {
         getUserAccount() { return this.userInfo; },
-        getFormType() { return this.formType; }
+        getFormType() { return this.formType; },
+        getFormProps() { 
+            if(this.formType == "CardForm" && this.editMode) 
+                return {isEditting: true};
+
+            return {};
+        }
     },
     props: {
         show: {
@@ -116,16 +134,36 @@ export default {
             showProxy: this.show,
             userInfo: {},
             changePassword: false,
-            formType: "CardForm"
+            formType: "CardForm",
+            editMode: false
         }
     },
     methods: {
         handleCreateCard() {
             this.formType = "CardForm"; // using Vue component tag to render form types dynamically
+            this.editMode = false;
             this.showProxy = true;
+            this.$refs.formObj.onReset();
+        },
+        handleUpdateCard() {
+            this.formType = "CardForm";
+            this.editMode = true;
+            this.showProxy = true;
+            this.$refs.formObj.onReset();
         },
         handleDeleteCard() {
             this.formType = "DeleteCardForm"; // using Vue component tag to render form types dynamically
+            this.editMode = false;
+            this.showProxy = true;
+        },
+        handleCreateCombo() {
+            this.formType = "ComboForm";
+            this.editMode = false;
+            this.showProxy = true;
+        },
+        handleDeleteCombo() {
+            this.formType = "DeleteComboForm";
+            this.editMode = false;
             this.showProxy = true;
         },
         handleUserUpdate(user, confirmPassword) {

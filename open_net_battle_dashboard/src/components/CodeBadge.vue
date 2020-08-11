@@ -45,5 +45,6 @@ export default {
     font-size:18px;
     margin:1px;
     color:yellow;
+    vertical-align: text-top;
 }
 </style>

@@ -1,10 +1,18 @@
+<!-- 
+    Very similar to CardInspectItem except is a card component that pops up as a modal
+    This is used to inspect real card data.
+    Use Item for forms.
+-->
 <template>
     <b-modal centered hide-footer
-        ref="card-view-modal"  size="sm" 
+        ref="card-view-modal"  
+        size="sm" 
         header-bg-variant="dark"
         header-text-variant="light"
         @hide="handleHidden">
+
         <template v-slot:modal-title v-if="!!card">
+            <img :src="card.icon" class="card-inspect-icon"/>
             {{ card.name }}&nbsp;
             <b-badge id="card-id-badge" variant="light">
                 <b-tooltip target="card-id-badge" variant="light">
@@ -14,7 +22,7 @@
             </b-badge>
         </template>
 
-        <b-container fluid v-if="!!card">
+        <b-container fluid v-if="!!card" :class="[getClass(card), 'cardContainer']">
             <b-row>
                 <img :src="card.image" width="112px" height="96px" class="image"/> 
             </b-row>
@@ -26,13 +34,18 @@
                     <Element :type="card.element"/>
                 </b-col>
                 <b-col cols="8" class="damage">
+                    <span v-if="card.timeFreeze"> 
+                        <b-icon icon="clock"/>
+                    </span>
                     {{ (card.damage > 0)? card.damage : '-' }}
                 </b-col>
             </b-row>
             <b-row>
                 <b-textarea disabled :value="getCardDescription"/>
+                <small>Limit {{ card.limit }} per folder</small>
             </b-row>
         </b-container>
+
         <b-button class="mt-2" variant="outline-danger" block @click="hideModal">Close</b-button>
     </b-modal>
 </template>
@@ -67,6 +80,10 @@ export default {
         show: {
             type: Boolean,
             default: false
+        },
+        meta: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -83,6 +100,23 @@ export default {
         }
     },
     methods: {
+        toggleMeta() {
+            this.meta = !this.meta;
+        },
+        getClass(card) {
+            switch(card.class) {
+                case 1:
+                    return "Standard";
+                case 2:
+                    return "Mega";
+                case 3:
+                    return "Giga";
+                case 4: 
+                    return "Dark";
+                default:
+                    return "Standard";
+            }
+        },
         showModal() {
             this.showProxy = true;
             this.$refs['card-view-modal'].show();
@@ -104,6 +138,10 @@ export default {
 </script>
 
 <style scoped>
+/**
+Element stylings
+ */
+
 .cardId {
     font-size:small;
 }
@@ -114,6 +152,10 @@ export default {
 
 .left-aligned {
     padding-left: 0px;
+}
+
+.right-aligned {
+    padding-right: 0px;
 }
 
 .damage {

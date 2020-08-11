@@ -42,7 +42,6 @@
 
 <script>
 import PublicFolderItem from "@/components/PublicFolderItem";
-// import axios from 'axios'
 import { mapGetters } from 'vuex'
 
 export default {

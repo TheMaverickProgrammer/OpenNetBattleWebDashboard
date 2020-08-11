@@ -5,6 +5,7 @@ import { folders } from './modules/folders'
 import { publicFolders } from './modules/publicFolders'
 import { cards } from './modules/cards'
 import { alerts } from './modules/alerts'
+import { combos } from './modules/combos'
 
 Vue.use(Vuex);
 
@@ -56,12 +57,14 @@ export default new Vuex.Store({
             this.dispatch('folders/clearFolders', { namespaced: true});
             this.dispatch('publicFolders/clearFolders', { namespace: true});
             this.dispatch('cards/clearCards', { namespaced: true});
+            this.dispatch('combos/clearCombos', { namespaced: true });
         }
     },
     modules: {
         folders,
         publicFolders,
         cards,
-        alerts
+        alerts,
+        combos
     }
 });
