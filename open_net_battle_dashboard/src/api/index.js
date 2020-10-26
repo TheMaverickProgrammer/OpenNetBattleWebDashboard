@@ -301,15 +301,35 @@ const plugin = {
             return api.add.user(account)
             .then(onData)
             .catch(err=>{
-                let payload =  err.response.data.error;
-                let message = payload;
+                let message = "There was a problem trying to sign up";
+                let payload = err.response;
 
-                if(typeof payload.name !== 'undefined') {
-                    message = payload.message;
+                if (err.response) {
+                    // Request made and server responded
+                    //console.log(err.response.data);
+                    //console.log(err.response.status);
+                    //console.log(err.response.headers);
+                    let status = err.response.status;
+
+                    if(status == "401") {
+                        message = "Tell the coder they forgot to give the dashboard permissions";
+                    } else if(status == "500") {
+                        message = "Tell the coder they broke the server";
+                    } else if(status == "404") {
+                        message = "Tell the coder the signup web endpoint doesn't exist";
+                    }
+                } else if (err.request) {
+                    // The request was made but no response was received
+                    //console.log(err.request);
+                    message = err.request;
+                } else {
+                    //// Something happened in setting up the request that triggered an Error
+                    console.log('Error', err.message);
+                    message = err.message;
                 }
 
                 // mongo error
-                if(typeof payload.errmsg !== 'undefined') {
+                if(payload && typeof payload.errmsg !== 'undefined') {
                     if(String(payload.code) === "11000") {
                         if(payload.errmsg.indexOf("email") > -1) {
                             message = "Email in use by another user!"
