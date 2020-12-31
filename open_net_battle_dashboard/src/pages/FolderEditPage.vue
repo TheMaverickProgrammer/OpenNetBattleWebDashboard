@@ -1,6 +1,7 @@
 <template>
     <div>
-        <CardTable removable 
+        <CardTable removable
+        :header=header
         @remove-cards="handleRemoveCards"
         :cards="cards"/>
         <b-card>
@@ -20,7 +21,8 @@ export default {
     },
     data() {
         return {
-            cards: []
+            cards: [],
+            header: ""
         }
     },
     computed: {
@@ -45,6 +47,8 @@ export default {
                     });
                 }
             });
+
+            this.header = "Edit " + folder.name;
         },
         handleAddCardsFromLibrary() {
             this.$router.push('add-cards-from-library');

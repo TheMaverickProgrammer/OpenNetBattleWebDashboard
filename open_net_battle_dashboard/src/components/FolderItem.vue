@@ -17,7 +17,8 @@
                             </b-card-text>
                         </b-col>
                         <b-col cols="5">
-                            <b-card-text>
+                            <b-card-text :class="{red: cards.length > maxCardSize}">
+                                <b-icon-exclamation-triangle v-b-tooltip.hover.top="getValidResult.err" v-if="getValidResult.ok==false" class="red"/>
                                 {{ cards.length }}/{{ maxCardSize }}
                             </b-card-text>
                         </b-col>
@@ -60,6 +61,10 @@ export default {
             let year = dateObj.getUTCFullYear();
 
             return month + "/" + day + "/" + year;
+        },
+        getValidResult() {
+            let result = this.$api.isFolderValid(this.cards);
+            return result;
         }
     },
     methods: {
@@ -99,6 +104,11 @@ export default {
             default: false,
             type: Boolean
         }
+    },
+    mounted() {
+        this.cards.forEach((id)=>{
+            this.$api.prefetchCardById(id);
+        });
     }
 }
 </script>
@@ -106,5 +116,13 @@ export default {
 <style scoped>
 .folder-card {
     filter: drop-shadow(8px 8px 5px rgba(0,0,0,0.25));
+}
+
+.black {
+    color:black;
+}
+
+.red {
+    color:red !important;
 }
 </style>

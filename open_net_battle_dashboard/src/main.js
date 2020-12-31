@@ -48,3 +48,23 @@ export const bus = new Vue({
   render: h => h(App),
   components: { App }
 })
+
+Array.prototype.duplicates = function() {
+  var len=this.length,
+      out=[],
+      counts={};
+
+  for (var i=0;i<len;i++) {
+    var item = this[i];
+    counts[item] = counts[item] >= 1 ? counts[item] + 1 : 1;
+    if (counts[item] === 2) {
+      out.push(item);
+    }
+  }
+
+  return out;
+}
+
+Array.prototype.unique = function() {
+  return [...new Set(this)];
+}

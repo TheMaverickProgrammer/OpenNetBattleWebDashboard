@@ -2,6 +2,7 @@
   <div class="app-background">
     <CardInspectModal :card="inspectCard" :show="!!inspectCard" @hidden="handleHiddenModal"/>
 
+    <h2 v-if="header.length > 0">{{this.header}}</h2>
     <b-table
       @row-selected="onRowSelected"
       id="card-table"
@@ -132,6 +133,10 @@ export default {
       CodeBadge
     },
     props: {
+      header: {
+        default: "",
+        type: String
+      },
       selectable: {
         default: false,
         type: Boolean

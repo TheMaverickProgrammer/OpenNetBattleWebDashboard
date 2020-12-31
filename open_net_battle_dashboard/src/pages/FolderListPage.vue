@@ -189,13 +189,22 @@ export default {
                     let newFolder = {...this.preview};
                     delete newFolder.id;
 
+                    const result = this.$api.isFolderValid(newFolder);
+
+                    if(result.ok==false) {
+                        // Prevent sharing cards
+                        const alert = { message: result.err, type: 'danger', title: 'Failed to share'};
+                        this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                        return;
+                    }
+
                     this.$api.add.publicFolder(newFolder).then((response) => {
                         let payload = response.data;
                         let folder = payload.data;
                         this.$store.dispatch('publicFolders/addFolder', folder, {namespaced: true});
                     }).catch(err => {
                         // An error occurred
-                        const alert = { message: err.response.data.error, type: 'danger', title: 'Failed to share with peers'};
+                        const alert = { message: err.response.data.error, type: 'danger', title: 'Failed to share'};
                         this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
                     })
                 }

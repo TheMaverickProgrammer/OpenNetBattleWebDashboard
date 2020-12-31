@@ -16,6 +16,8 @@ const resources = {
     COMBOS: base_url + '/combos'
 }
 
+const folderMaxLength = 30;
+
 const api = {
     auth: {
         login(username, password, cancelToken) {
@@ -388,6 +390,58 @@ const plugin = {
             }
 
             //return folder; // make synchronous?
+        },
+
+        Vue.prototype.$api.isFolderValid = function (cardList) {
+            /*
+            Returns an object with the format {ok:boolean, <err:String>}
+            `err` is only valid if `ok` is false
+    
+            algorithm:
+            1. Check for max card limit
+            2. For every card, make an entry for that card's property model
+            3. Check for duplicates
+            4. For each duplicate, check the card limit
+            5. If the limit conditions are not exceeded, the folder is OK
+            */
+            let getCardById = store.getters['cards/getCardById'];
+            let models = [];
+            let messages = [];
+
+            if(cardList.length > folderMaxLength) {
+                messages.push("Folder exceeds max size of " + folderMaxLength);
+            }
+
+            cardList.forEach((id)=>{
+                let card = getCardById(id);
+
+                if(!((card.modelId || null) == null)) {
+                    models[card.id] = card.modelId;
+                }
+            });
+
+            cardList.forEach((id)=> {
+                const count = cardList.filter((v) => (models[v] == models[id] && typeof models[v] !== 'undefined')).length;
+
+                let card = getCardById(id);
+
+                if ((card.id || null) == null) {
+                    // We are waiting for data...
+                    return {ok: false, err: "Syncing..."};
+                }
+
+                if(count > card.limit) {
+                    messages.push(card.name +" exceeds limit of " + card.limit);
+                }
+            });
+            
+            let message_str = "";
+            
+            messages.unique().forEach((msg) => {
+                message_str += msg + "\n";
+            });
+
+            return {ok: messages.length == 0, err: message_str};
         }
     }
 }

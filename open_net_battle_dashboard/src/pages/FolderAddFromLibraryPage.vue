@@ -38,6 +38,8 @@ export default {
             let cardIdsOnly = [];
             let cardLimitCounter = {};
 
+            let success = true;
+
             cards.forEach(card=> {
                 let counter = cardLimitCounter[card.id];
 
@@ -50,10 +52,13 @@ export default {
                 if(cardLimitCounter[card.id] <= 0) {
                     const alert = { message: "Card " + card.name + " duplicates over the limit of " + card.limit, type: 'danger' }
                     this.$store.dispatch('alerts/addAlert', alert);
+                    success = false;
                 }
 
                 cardIdsOnly = [...cardIdsOnly, card.id];
             });
+
+            if(success == false) return; // early abort
 
             let folderSize = folder.cards.length;
             let newFolder = { cards: [...folder.cards, ...cardIdsOnly], id: folder.id };
