@@ -3,8 +3,30 @@
     <CardInspectModal :card="inspectCard" :show="!!inspectCard" @hidden="handleHiddenModal"/>
 
     <h2 v-if="header.length > 0">{{this.header}}</h2>
+      <b-row class="filter">
+        <b-form-group
+          label="Filter"
+          label-for="filter-input"
+          label-cols-sm="3"
+          label-align-sm="right"
+          label-size="sm"
+          class="mb-0"
+        >
+          <b-input-group size="sm">
+            <b-form-input
+              id="filter-input"
+              v-model="filter"
+              type="search"
+              placeholder="Type to Search"
+            ></b-form-input>
+
+            <b-input-group-append>
+              <b-button variant="danger" :disabled="!filter" @click="onClearFilter">Clear</b-button>
+            </b-input-group-append>
+          </b-input-group>
+        </b-form-group>
+      </b-row>
     <b-table
-      @row-selected="onRowSelected"
       id="card-table"
       sticky-header="500px"
       responsive="lg"
@@ -16,6 +38,9 @@
       :busy="busy"
       :per-page="perPage"
       :current-page="currentPage"
+      :filter="filter"
+      @filtered="onFiltered"
+      @row-selected="onRowSelected"
     >
       <template v-slot:table-busy>
         <div class="text-center text-danger my-2">
@@ -91,7 +116,7 @@
 
     <b-pagination
       v-model="currentPage"
-      :total-rows="cards.length"
+      :total-rows="rows"
       :per-page="perPage"
       aria-controls="card-table"
       align="center"
@@ -164,6 +189,9 @@ export default {
         // will make the scrollbar reset
         this.$refs.selectableTable.$el.scrollTop = 0;
 
+      },
+      cards() {
+        this.rows = this.cards.length;
       }
     },
     data() {
@@ -191,7 +219,8 @@ export default {
         perPage: 20,
         currentPage: 1,
         rows: 0,
-        inspectCard: null
+        inspectCard: null,
+        filter:null
       }
   },
   methods: {
@@ -230,12 +259,32 @@ export default {
         default:
           return "StandardText";
       }
+    },
+    onFiltered(filteredItems) {
+      // Trigger pagination to update the number of buttons/pages due to filtering
+      this.rows = filteredItems.length;
+      this.currentPage = 1;
+    },
+    onClearFilter() {
+      this.filter = null;
+      this.currentPage = 1;
+      this.rows = this.cards.length;
     }
+  },
+  mounted() {
+    // if cards are supplied through props (and are static)
+    this.rows = this.cards.length;
   }
 }
 </script>
 
 <style scoped>
+
+.filter {
+  font-weight:bold;
+  margin-left:5px;
+}
+
 .action {
   margin-right: 5px;
 }
