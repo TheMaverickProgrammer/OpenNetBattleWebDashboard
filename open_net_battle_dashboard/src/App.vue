@@ -2,7 +2,7 @@
   <div id="app">
     <div v-if="$store.state.user.username != ''">
       <div id="app-content"> 
-        <Navbar :user="$store.state.user.username"/>
+        <Navbar :user="$store.state.user.username" :monies="$store.state.user.monies"/>
         <transition name="fade" mode="out-in">    
           <keep-alive :include="keepAliveList">    
             <router-view/>

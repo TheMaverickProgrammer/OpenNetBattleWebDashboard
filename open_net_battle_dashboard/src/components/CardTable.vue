@@ -203,8 +203,9 @@ export default {
         { key: 'code', sortable: true },
         { key: 'element', sortable: true},
         { key: 'secondaryElement', label: '2nd Element', sortable: true },
+        { key: 'limit', sortable: true },
         { key: 'description', sortable: false },
-        { key: 'verboseDescription', sortable: false}
+        { key: 'verboseDescription', label: 'More', sortable: false}
       ];
 
       if(this.removable) {

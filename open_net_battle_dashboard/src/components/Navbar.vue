@@ -10,10 +10,12 @@
                 <b-nav-item :to="{ path: '/cards' }" class="no-link">All Cards</b-nav-item>
                 <b-nav-item :to="{ path: '/public-folders'}" class="no-link">Public Folders</b-nav-item>
                 <b-nav-item :to="{ path: '/combos' }" class="no-link">Combos</b-nav-item>
+                <b-nav-item :to="{ path: '/economy'}" class="no-link">Economy</b-nav-item>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->
             <b-navbar-nav class="ml-auto">
+                <b-nav-text><Monies class="monies" :value="monies" /></b-nav-text>
                 <b-nav-item-dropdown right>
                     <!-- Using 'button-content' slot -->
                     <template v-slot:button-content>
@@ -30,13 +32,15 @@
 
 <script>
 import Breadcrumb from './Breadcrumb'
+import Monies from './Monies'
 
 export default {
     name: "Navbar",
     components: {
-        Breadcrumb
+        Breadcrumb,
+        Monies
     },
-    props: ["user"],
+    props: ["user", "monies"],
     methods: {
         handleLogout() {
             // Simulate an async request
@@ -57,5 +61,17 @@ export default {
     text-decoration: none;
     font: inherit;
     color:inherit;
+    font-weight: bold;
+}
+
+.no-link:hover {
+    text-decoration: underline;
+    text-decoration-color: white;
+    text-underline-offset: 0.5em;
+}
+
+.monies {
+    font-weight: bold;
+    color: gold;
 }
 </style>

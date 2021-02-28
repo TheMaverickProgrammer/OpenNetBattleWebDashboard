@@ -41,10 +41,10 @@ export const combos = {
         addCombo(context, combo) {
             context.commit('doAddCombo', combo);
         },
-        removeCard(context, index) {
+        removeCombo(context, index) {
             context.commit('doRemoveCombo', index);
         },
-        clearCards(context) {
+        clearCombos(context) {
             context.commit('doClearCombos');
         }
     }

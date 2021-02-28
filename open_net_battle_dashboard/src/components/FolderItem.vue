@@ -76,6 +76,11 @@ export default {
             return this.checked;
         }
     },
+    data() {
+        return {
+            checked: false
+        }
+    },
     props: {
         id: String,
         title: String,
@@ -91,10 +96,6 @@ export default {
         dateLabel: {
             default: "Created",
             type: String
-        },
-        checked: {
-            default: false,
-            type: Boolean
         },
         checkable: {
             default: false,

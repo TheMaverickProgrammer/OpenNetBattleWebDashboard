@@ -11,6 +11,8 @@ const resources = {
     ADMINS: base_url + "/admins",
     USERS: base_url + "/users",
     FOLDERS: base_url + "/folders",
+    PRODUCTS: base_url + "/products",
+    KEYITEMS: base_url + "/keyitems",
     PUBLIC_FOLDERS: base_url + '/public-folders',
     CARD_MODELS: base_url + '/card-properties',
     COMBOS: base_url + '/combos'
@@ -82,6 +84,34 @@ const api = {
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
+        keyItem(id) {
+            return axios.get(resources.KEYITEMS + "/" + id,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' }
+                })
+        },
+        productsList() {
+            return axios.get(resources.PRODUCTS,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        keyItemsCreated() {
+            return axios.get(resources.KEYITEMS, 
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' }
+                })
+        },
+        keyItemsOwned() {
+            return axios.get(resources.KEYITEMS + "/owned",
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' }
+                })
+        },
         /* 
         API uses time to fetch real-time updates
         Use `milli = 0` to fetch all resources of type
@@ -120,6 +150,14 @@ const api = {
         },
         combosAfterDate(milli, cancelToken) {
             return axios.get(resources.COMBOS + "/since/" + Math.floor(milli/1000),
+                {
+                    cancelToken: cancelToken || null,
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        productsAfterDate(milli, cancelToken) {
+            return axios.get(resources.PRODUCTS + "/since/" + Math.floor(milli/1000), 
                 {
                     cancelToken: cancelToken || null,
                     withCredentials: true,
@@ -168,6 +206,22 @@ const api = {
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
+        product(product) {
+            return axios.post(resources.PRODUCTS,
+                product,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        keyItem(keyItem) {
+            return axios.post(resources.KEYITEMS,
+                keyItem, 
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' }
+                })
+        } 
     },
     update: {
         cardModel(cardModel) {
@@ -231,6 +285,30 @@ const api = {
                     withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
+        },
+        product(product) {
+            let id = product.id;
+            let copy = {...product};
+            delete copy.id;
+
+            return axios.put(resources.PRODUCTS +"/" + id,
+                copy,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        keyItem(keyItem) {
+            let id = keyItem.id;
+            let copy = {...keyItem};
+            delete keyItem.id;
+
+            return axios.put(resources.KEYITEMS + "/" + id,
+            copy,
+            {
+                withCredentials: true,
+                headers: { 'Content-Type': 'application/json'}
+            })
         }
     },
     delete: {
@@ -274,6 +352,20 @@ const api = {
                 {
                     withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        product(id) {
+            return axios.delete(resources.PRODUCTS + "/" + id,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' }
+                })
+        },
+        keyItem(id) {
+            return axios.delete(resources.KEYITEMS + "/" + id,
+                {
+                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' }
                 })
         }
     }
@@ -347,6 +439,12 @@ const plugin = {
         },
 
         Vue.prototype.$api.prefetchCardById = function (id, onComplete) {
+            if(!id) {
+                let alert = { message: "Attempting to prefetch a card with no ID provided", type: "danger", title: "error" };
+                store.dispatch('alerts/addAlert', alert, { namespaced: true });
+                return;
+            }
+
             onComplete = onComplete || function () { };
 
             let getCardById = store.getters['cards/getCardById'];
@@ -390,6 +488,62 @@ const plugin = {
             }
 
             //return folder; // make synchronous?
+        },
+
+        Vue.prototype.$api.prefetchProductName = function(id, onComplete) {
+            onComplete = onComplete || function () { };
+
+            let getProductById = store.getters['products/getProductById'];
+            let product = getProductById(id);
+
+            if(!product.itemId) {
+                let alert = { message:  "No product with an item associated", type: "danger", title: "error" };
+                store.dispatch('alerts/addAlert', alert, { namespaced: true });
+                onComplete(null);
+                return;
+            }
+
+            let DoKeyItemLookup = function() {
+                if (typeof product.name == 'undefined') {
+                    // Try fetching from the api
+                    api.get.keyItem(product.itemId).then(payload => {
+                        product.name = payload.data.data.name;
+                        store.dispatch('products/updateProduct', product);
+                    }).catch(err => {
+                        let alert = { message:  err.response.data.error, type: "danger", title: "error" };
+                        store.dispatch('alerts/addAlert', alert, { namespaced: true });
+                    }).finally(() => { onComplete(product.name) });
+                }
+            };
+
+            let DoCardItemLookup = function() {
+                if (typeof product.name == 'undefined') {
+                    // Try fetching from the api
+                    api.get.card(product.itemId).then(payload => {
+                        product.name = payload.data.data.detail.name;
+                        store.dispatch('products/updateProduct', product);
+                    }).catch(err => {
+                        let alert = { message:  err.response.data.error, type: "danger", title: "error" };
+                        store.dispatch('alerts/addAlert', alert, { namespaced: true });
+                    }).finally(() => { onComplete(product.name) });
+                }
+            };
+
+            if(typeof product.name != 'undefined') {
+                // we have it
+                onComplete(product.name);
+                return;
+            }
+
+            if(product.type == "KeyItem") {
+                DoKeyItemLookup();
+            } else if(product.type == "Card") {
+                DoCardItemLookup();
+            } else {
+                let alert = { message:  "Type missing from product listing", type: "danger", title: "error" };
+                store.dispatch('alerts/addAlert', alert, { namespaced: true });
+                onComplete(null);
+            }
         },
 
         Vue.prototype.$api.isFolderValid = function (cardList) {

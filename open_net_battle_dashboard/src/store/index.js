@@ -6,6 +6,7 @@ import { publicFolders } from './modules/publicFolders'
 import { cards } from './modules/cards'
 import { alerts } from './modules/alerts'
 import { combos } from './modules/combos'
+import { products } from './modules/products'
 
 Vue.use(Vuex);
 
@@ -16,6 +17,8 @@ export default new Vuex.Store({
             userId: "",
             email: "",
             twitter: "",
+            pool: [],
+            monies: 0,
             isAdmin: false
         }
     },
@@ -48,6 +51,8 @@ export default new Vuex.Store({
                 userId: "",
                 email: "",
                 twitter: "",
+                pool: [],
+                monies: 0,
                 isAdmin: false
             };
 
@@ -58,6 +63,7 @@ export default new Vuex.Store({
             this.dispatch('publicFolders/clearFolders', { namespace: true});
             this.dispatch('cards/clearCards', { namespaced: true});
             this.dispatch('combos/clearCombos', { namespaced: true });
+            this.dispatch('products/clearProducts', { namespaced: true });
         }
     },
     modules: {
@@ -65,6 +71,7 @@ export default new Vuex.Store({
         publicFolders,
         cards,
         alerts,
-        combos
+        combos,
+        products
     }
 });

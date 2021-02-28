@@ -8,6 +8,7 @@ import PublicFolderListPage from '@/pages/PublicFolderListPage'
 import ComboListPage from '@/pages/ComboListPage'
 import CardLibraryViewPage from '@/pages/CardLibraryViewPage'
 import CodeEditPage from '@/pages/CodeEditPage'
+import ProductEditPage from '@/pages/ProductEditPage'
 
 Vue.use(Router)
 
@@ -101,6 +102,17 @@ export default new Router({
         breadcrumb: [
             { name: 'Home', link: '/'},
             { name: 'Combos' }
+            ]
+        }
+    },
+    {
+        path: '/economy',
+        name: 'ProductEditPage',
+        component: ProductEditPage,
+        meta: {
+        breadcrumb: [
+            { name: 'Home', link: '/'},
+            { name: 'Economy' }
             ]
         }
     }
