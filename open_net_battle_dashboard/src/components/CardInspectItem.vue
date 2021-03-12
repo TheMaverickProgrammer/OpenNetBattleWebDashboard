@@ -5,46 +5,56 @@
 -->
 
 <template>
-    <b-card centered hide-footer
-        size="sm" 
-        header-bg-variant="dark"
-        header-text-variant="light">
-        <template v-slot:header v-if="!!card">
-            <img :src="card.icon" class="card-inspect-icon" v-if="card.icon.length"/>
-            {{ card.name }}&nbsp;
-            <b-badge id="card-id-badge" variant="light" v-if="!noid">
-                <b-tooltip target="card-id-badge" variant="light">
-                    <p class="cardId">{{ typeof card.id !== 'undefined'?card.id:"Unavailable" }}</p>
-                </b-tooltip>
-                id
-            </b-badge>
-        </template>
+    <div>
+        <b-card v-if="mini==false"
+            centered hide-footer
+            size="sm" 
+            header-bg-variant="dark"
+            header-text-variant="light">
+            <template v-slot:header v-if="!!card">
+                <img :src="card.icon" class="card-inspect-icon" v-if="card.icon.length"/>
+                {{ card.name }}&nbsp;
+                <b-badge id="card-id-badge" variant="light" v-if="!noid">
+                    <b-tooltip target="card-id-badge" variant="light">
+                        <p class="cardId">{{ typeof card.id !== 'undefined'?card.id:"Unavailable" }}</p>
+                    </b-tooltip>
+                    id
+                </b-badge>
+            </template>
 
-        <b-container fluid v-if="!!card" :class="[card.class, 'cardContainer']">
-            <b-row>
-                <img :src="card.image" width="112px" height="96px" class="image"/> 
-            </b-row>
-            <b-row class="data-row">
-                <b-col cols="2" class="left-aligned">
-                    <CodeBadge :cardId="card.id" v-if="!noid"/>
-                    <CodeBadge :codeFamily="card.codeFamily" :code="card.code" v-if="noid"/>
-                </b-col>
-                <b-col cols="2" class="left-aligned"> 
-                    <Element :type="card.element? card.element : 'None'"/>
-                </b-col>
-                <b-col cols="8" class="damage">
-                    <span v-if="card.timeFreeze"> 
-                        <b-icon icon="clock"/>
-                    </span>
-                    {{ (card.damage > 0)? card.damage : '-' }}
-                </b-col>
-            </b-row>
-            <b-row>
-                <b-textarea disabled :value="getCardDescription"/>
-                <small>Lim {{ card.limit }} per folder </small>
-            </b-row>
-        </b-container>
-    </b-card>
+            <b-container fluid v-if="!!card" :class="[card.class, 'cardContainer']">
+                <b-row>
+                    <img :src="card.image" width="112px" height="96px" class="image"/> 
+                </b-row>
+                <b-row class="data-row">
+                    <b-col cols="2" class="left-aligned">
+                        <CodeBadge :cardId="card.id" v-if="!noid"/>
+                        <CodeBadge :codeFamily="card.codeFamily" :code="card.code" v-if="noid"/>
+                    </b-col>
+                    <b-col cols="2" class="left-aligned"> 
+                        <Element :type="card.element? card.element : 'None'"/>
+                    </b-col>
+                    <b-col cols="8" class="damage">
+                        <span v-if="card.timeFreeze"> 
+                            <b-icon icon="clock"/>
+                        </span>
+                        {{ (card.damage > 0)? card.damage : '-' }}
+                    </b-col>
+                </b-row>
+                <b-row>
+                    <b-textarea disabled :value="getCardDescription"/>
+                    <small>Lim {{ card.limit }} per folder </small>
+                </b-row>
+            </b-container>
+        </b-card>
+        <div v-if="mini==true">
+            <b-container fluid v-if="!!card" :class="[card.class, 'cardContainer']">
+                <b-row>
+                    <img :src="card.image" width="112px" height="96px" class="image"/> 
+                </b-row>
+            </b-container>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -75,6 +85,10 @@ export default {
             default: null
         },
         noid: {
+            type: Boolean,
+            default: false
+        },
+        mini: {
             type: Boolean,
             default: false
         }

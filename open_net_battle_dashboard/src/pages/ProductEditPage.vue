@@ -1,50 +1,59 @@
 <template>
-    <div>
+    <div class="app-background">
         <!-- app contents begin -->
-        <div class="app-background scrollable">
-            <h1>Your Shop&nbsp;<b-icon-bag/></h1>
-            <b-container fluid class="action-panel">
-                <b-row>
-                    <b-col align-self="start" cols="2">
-                        <b-button variant="outline-success" block @click="toggleCreateProduct"><b-icon icon="plus"/>New Product</b-button>
-                    </b-col>
-                    <b-col cols="2">
-                        <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/>Delete</b-button>
-                    </b-col>
-                </b-row>
-                <b-collapse id="product-collapse" v-model="showCreateProduct">
-                        <b-card>
-                            <b-form @submit.stop.prevent="handleProductCreate">
-                                <b-row>
-                                    <b-col cols="3">
-                                        <b-form-input placeholder="ItemId" required/>
-                                    </b-col>
-                                    <b-col cols="3">
-                                        <b-form-input placeholder="Cost" required/>
-                                    </b-col>
-                                    <b-col cols="2">
-                                        <b-button variant="outline-success" type="submit"><b-icon-check/>Create</b-button>
-                                    </b-col>
-                                </b-row>
-                            </b-form>
-                        </b-card>
-                </b-collapse>
-            </b-container>
+        <b-tabs >
+            <b-tab title="My Shop" active>
+                <div class="scrollable">
+                <h1>My Shop&nbsp;<b-icon-bag/></h1>
+                <b-container fluid class="action-panel">
+                    <b-row>
+                        <b-col align-self="start" cols="2">
+                            <b-button variant="outline-success" block @click="toggleCreateProduct"><b-icon icon="plus"/>New Product</b-button>
+                        </b-col>
+                        <b-col cols="2">
+                            <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/>Delete</b-button>
+                        </b-col>
+                    </b-row>
+                    <b-collapse id="product-collapse" v-model="showCreateProduct">
+                            <b-card>
+                                <b-form @submit.stop.prevent="handleProductCreate">
+                                    <b-row>
+                                        <b-col cols="3">
+                                            <b-form-input placeholder="ItemId" required/>
+                                        </b-col>
+                                        <b-col cols="3">
+                                            <b-form-input placeholder="Cost" required/>
+                                        </b-col>
+                                        <b-col cols="2">
+                                            <b-button variant="outline-success" type="submit"><b-icon-check/>Create</b-button>
+                                        </b-col>
+                                    </b-row>
+                                </b-form>
+                            </b-card>
+                    </b-collapse>
+                </b-container>
 
-            <hr>
-            <ul :style="gridStyle" v-if="getProductsList.length>0" class="product-card-list">
-                <li v-bind:key="product.id" v-for="product in getProductsList">
-                    <ProductItem 
-                    checkable
-                    :id="product.id"
-                    :itemId="product.itemId"
-                    :monies="product.monies" 
-                    :type="product.type"
-                    />
-                </li>
-            </ul>
-            <b-card v-if="getProductsList.length == 0">This place is empty</b-card>
-        </div>
+                <hr>
+                <ul :style="gridStyle" v-if="getProductsList.length>0" class="product-card-list">
+                    <li v-bind:key="product.id" v-for="product in getProductsList">
+                        <ProductItem 
+                        checkable
+                        :id="product.id"
+                        :itemId="product.itemId"
+                        :monies="product.monies" 
+                        :type="product.type"
+                        />
+                    </li>
+                </ul>
+                <b-card v-if="getProductsList.length == 0">This place is empty</b-card>
+                </div>
+            </b-tab>
+            <b-tab title="My Tx"> 
+            </b-tab>
+            <b-tab title="Create KeyItems"> 
+
+            </b-tab>
+        </b-tabs>
     </div>
 </template>
 
@@ -181,5 +190,9 @@ export default {
 
 ul {
   list-style-type: none;
+}
+
+h1 {
+    padding: 10px;
 }
 </style>

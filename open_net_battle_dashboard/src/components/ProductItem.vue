@@ -25,12 +25,12 @@
             </template>
             <b-card-text>
                 <div v-if="type=='Card'">
-                    <CardInspectItem :card="getAsCard" v-if="getAsCard"/>
+                    <CardInspectItem :card="getAsCard" v-if="getAsCard" mini/>
                     <b-spinner v-if="!getAsCard"/>
                 </div>
                 <div><b-icon-puzzle v-if="type=='KeyItem'"/></div>
-                <b-badge variant="dark" pill><Monies :value="monies"/></b-badge>
-                <b-badge variant="dark" pill><span class="product-id-label">Product ID</span> {{id}}</b-badge>
+                <b-badge variant="dark" pill><Monies :value="monies"/></b-badge><br/>
+                <b-badge variant="dark" pill><small><span class="product-id-label">Product ID</span> {{id}}</small></b-badge>
             </b-card-text>
         </b-card>
     </div>

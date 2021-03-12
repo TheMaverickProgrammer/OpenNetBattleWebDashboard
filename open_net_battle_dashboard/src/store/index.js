@@ -7,6 +7,7 @@ import { cards } from './modules/cards'
 import { alerts } from './modules/alerts'
 import { combos } from './modules/combos'
 import { products } from './modules/products'
+import { keyitems } from './modules/keyitems'
 
 Vue.use(Vuex);
 
@@ -64,6 +65,7 @@ export default new Vuex.Store({
             this.dispatch('cards/clearCards', { namespaced: true});
             this.dispatch('combos/clearCombos', { namespaced: true });
             this.dispatch('products/clearProducts', { namespaced: true });
+            this.dispatch('keyitems/clearKeyItems', { namespaced: true });
         }
     },
     modules: {
@@ -72,6 +74,7 @@ export default new Vuex.Store({
         cards,
         alerts,
         combos,
-        products
+        products,
+        keyitems
     }
 });

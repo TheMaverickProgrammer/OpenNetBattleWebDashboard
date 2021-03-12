@@ -6,7 +6,8 @@
 
             <b-collapse id="nav-collapse" is-nav>
             <b-navbar-nav>
-                <b-nav-item :to="{ path: '/folders' }" class="no-link">Folders</b-nav-item>
+                <b-nav-item :to="{ path: '/folders' }" class="no-link">My Folders</b-nav-item>
+                <b-nav-item :to="{ path: '/keyitems' }" class="no-link">My KeyItems</b-nav-item>
                 <b-nav-item :to="{ path: '/cards' }" class="no-link">All Cards</b-nav-item>
                 <b-nav-item :to="{ path: '/public-folders'}" class="no-link">Public Folders</b-nav-item>
                 <b-nav-item :to="{ path: '/combos' }" class="no-link">Combos</b-nav-item>

@@ -520,7 +520,7 @@ const plugin = {
                 if (typeof product.name == 'undefined') {
                     // Try fetching from the api
                     api.get.card(product.itemId).then(payload => {
-                        product.name = payload.data.data.detail.name;
+                        product.name = payload.data.data.detail.name + " " + payload.data.data.code;
                         store.dispatch('products/updateProduct', product);
                     }).catch(err => {
                         let alert = { message:  err.response.data.error, type: "danger", title: "error" };

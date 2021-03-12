@@ -9,6 +9,7 @@ import ComboListPage from '@/pages/ComboListPage'
 import CardLibraryViewPage from '@/pages/CardLibraryViewPage'
 import CodeEditPage from '@/pages/CodeEditPage'
 import ProductEditPage from '@/pages/ProductEditPage'
+import KeyItemListPage from '@/pages/KeyItemListPage'
 
 Vue.use(Router)
 
@@ -57,6 +58,17 @@ export default new Router({
                 { name: 'My Folders', link: '/folders'},
                 { name: 'Edit', /*link: '/folders/' + 123 + '/edit'*/}, // TODO: figure out how
                 { name: 'Add Cards From Library' }
+            ]
+        }
+    },
+    {
+        path: '/keyitems',
+        name: 'KeyItemsListPage',
+        component: KeyItemListPage,
+        meta: {
+            breadcrumb: [
+                { name: 'Home', link: '/'},
+                { name: 'My KeyItems'}
             ]
         }
     },
