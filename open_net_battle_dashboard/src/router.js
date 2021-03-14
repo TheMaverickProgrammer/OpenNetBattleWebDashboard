@@ -79,7 +79,7 @@ export default new Router({
         meta: {
             breadcrumb: [
                 { name: 'Home', link: '/'},
-                { name: 'All Cards'}
+                { name: 'My Chip Pool'}
             ]
         }
     },

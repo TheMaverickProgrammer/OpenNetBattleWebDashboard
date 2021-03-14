@@ -48,7 +48,7 @@ export default {
     },
     computed: {
         getSelf() {
-            return {title: this.title, monies: this.monies, itemId: this.itemId, type: this.type };
+            return {title: this.title, monies: this.monies, id: this.id, type: this.type };
         },
         getTypeIcon() {
             if(this.type == "KeyItem") {
@@ -90,7 +90,7 @@ export default {
         },
         onCheck() {
             this.checked = !this.checked;
-            this.$emit('check-folder', this.getSelf, this.checked);
+            this.$emit('check-product', this.getSelf, this.checked);
         },
         getChecked() {
             return this.checked;

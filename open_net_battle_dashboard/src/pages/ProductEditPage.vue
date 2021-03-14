@@ -48,6 +48,7 @@
                         :itemId="product.itemId"
                         :monies="product.monies" 
                         :type="product.type"
+                        @check-product="handleCheck"
                         />
                     </li>
                 </ul>
@@ -165,7 +166,62 @@ export default {
         //...mapGetters('products', ['getProductsList'])
     },
     methods: {
+        handleCheck(product, checked) {
+            let id = product.id;
+            let index = this.checkedList.findIndex(productId => productId == id);
+
+            if(index > -1 && !checked) {
+                this.checkedList.splice(index, 1);
+            } else if(index == -1 && checked) {
+                this.checkedList = [...this.checkedList, id];
+            }
+        },
+        handleDelete() {
+            const size = this.checkedList.length;
+            if(size > 0) {
+                let msg = 'Are you sure to want to delete these ' + size + ' products? There is no undo.';
+
+                if(size == 1) msg = 'Are you sure you want to delete this product? There is no undo.';
+
+                this.$bvModal.msgBoxConfirm(
+                    msg,
+                    {
+                        title: 'Are you sure?',
+                        okVariant: 'danger',
+                        okTitle: 'YES',
+                        cancelTitle: 'NO',
+                        footerClass: 'p-2',
+                        hideHeaderClose: false,
+                        centered: true
+                    }
+                ).then(value => {
+                    if(value) {
+                        this.checkedList.forEach((id) => {
+                            this.$api.delete.product(id).then(payload=>{
+                                this.$store.dispatch('products/removeProduct', id);
+                                const alert = { message: payload.data.data.message, type: 'info'};
+                                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                            }).catch(err=>{
+                                // An error occurred
+                                // We want to catch individual errors here so the loop is uninterrupted
+                                const alert = { message: err.response.data.error, type: 'danger', title: 'Error Deleting'};
+                                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                            }).finally(()=>{
+                                this.checkedList = [];
+                            });
+                        });
+                    }
+                })
+                .catch(err => {
+                    // An error occurred
+                    const alert = { message: err, type: 'danger', title: 'Internal Error'};
+                    this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                })
+            }
+        },
         createNewProduct() {
+            this.busy = true;
+
             if(this.newProductCost < 1) {
                 const alert = { message: "Cost most be a nonzero positive number", type: 'danger', title: 'Bad Cost'};
                 this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
@@ -177,8 +233,6 @@ export default {
                 monies: this.newProductCost,
                 type: this.selectedProduct.type
             };
-
-            console.log(JSON.stringify(this.selectedProduct));
 
             let self = this;
 
@@ -198,6 +252,8 @@ export default {
                 // An error occurred
                 const alert = { message: err.response.data.error, type: 'danger', title: 'Internal Error'};
                 this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+            }).finally( () => {
+                self.busy = false;
             });
         },
         addKeyItem() {
@@ -226,63 +282,6 @@ export default {
         hideCreateProduct() {
             this.showCreateProduct = false;
         },
-        handleDelete() {
-            const size = this.checkedList.length;
-            if(size > 0) {
-                let msg = 'Are you sure to want to delete these ' + size + ' products? There is no undo.';
-
-                if(size == 1) msg = 'Are you sure you want to delete this product? There is no undo.';
-
-                this.$bvModal.msgBoxConfirm(
-                    msg,
-                    {
-                        title: 'Are you sure?',
-                        okVariant: 'danger',
-                        okTitle: 'YES',
-                        cancelTitle: 'NO',
-                        footerClass: 'p-2',
-                        hideHeaderClose: false,
-                        centered: true
-                    }
-                ).then(value => {
-                    if(value) {
-                        /*this.checkedList.forEach((id) => {
-                            this.$api.delete.folder(id).then(payload=>{
-                                this.$store.dispatch('folders/removeFolder', id);
-                                const alert = { message: payload.data.data.message, type: 'info'};
-                                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
-                            }).catch(err=>{
-                                // An error occurred
-                                // We want to catch individual errors here so the loop is uninterrupted
-                                const alert = { message: err.response.data.error, type: 'danger', title: 'Error Deleting'};
-                                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
-                            }).finally(()=>{
-                                this.checkedList = [];
-                            });
-                        });*/
-                    }
-                })
-                .catch(err => {
-                    // An error occurred
-                    const alert = { message: err, type: 'danger', title: 'Internal Error'};
-                    this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
-                })
-            }
-        },
-        handleProductCreate() {
-            this.busy = false; // true;
-
-            /*this.$api.add.folder({name: this.newFolderName}).then(payload=>{
-                this.$store.dispatch('folders/addFolder', payload.data.data, {namespaced: true})
-                this.hideCreateFolderModal();
-                const alert = { message: "New Folder '" + payload.data.data.name + "' added!", type: 'success'};
-                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
-            }).catch(err=>{
-                // An error occurred
-                const alert = { message: err.response.data.error, type: 'danger', title:'Could Not Create'};
-                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
-            }).finally(()=>{ this.busy = false; });*/
-        }
     },
     mounted() {
         console.log("mounted");

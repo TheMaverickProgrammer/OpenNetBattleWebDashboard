@@ -1,6 +1,6 @@
 <template>
     <div>
-        <CardTable :cards="$store.state.cards.list" :busy="busy"/>
+        <CardTable :cards="userPool" :busy="busy"/>
         <b-card>
             <b-button v-b-tooltip.hover.bottom="'Useful for shakey network connections'" @click="handleRefetch">Refetch</b-button>
         </b-card>
@@ -18,7 +18,7 @@ export default {
     },
     data() {
         return {
-            busy: false, lastUpdated: 0
+            busy: false, lastUpdated: 0, userPoolList: []
         }
     },
     created() {
@@ -28,7 +28,10 @@ export default {
         this.fetch()
     },
     computed: {
-      ...mapGetters('cards', ['getCardById'])  
+      ...mapGetters('cards', ['getCardById'])  ,
+      userPool() {
+          return this.userPoolList
+      }
     },
     methods: {
         fetch() {
@@ -47,6 +50,15 @@ export default {
                 let alert = { message: err, type: "danger", title: "Internal Error" };
                 this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
             }).finally(()=> {
+                this.userPoolList = [];
+                
+                for(let id of this.$store.state.user.pool) {
+                    this.$api.prefetchCardById(id, card=>{
+                        card.id = id;
+                        this.userPoolList = [...this.userPoolList, card];
+                    });
+                }
+
                 this.busy = false; // Done
                 this.lastUpdated = Date.now();
             });
