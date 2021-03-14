@@ -58,12 +58,12 @@
             <b-tab title="My Tx"> 
             </b-tab>
             <b-tab title="Create KeyItems"> 
+                <h1>My Created KeyItems&nbsp;<b-icon-puzzle/></h1>
+                <b-card v-if="myCreatedKeyItems.length == 0">You have no created key items</b-card>
+                <b-table striped hover caption-top :items="myCreatedKeyItems" :fields="['name', 'description']">
+                </b-table>
+                <b-button class="btn-margin" variant="primary" v-b-toggle="'collapse-data-entry'">Create a new KeyItem</b-button>
                 <b-container>
-                    <h1>My Created KeyItems&nbsp;<b-icon-puzzle/></h1>
-                    <b-card v-if="myCreatedKeyItems.length == 0">You have no created key items</b-card>
-                    <b-table striped hover caption-top :items="myCreatedKeyItems" :fields="['name', 'description']">
-                    </b-table>
-                    <b-button class="btn-margin" variant="primary" v-b-toggle="'collapse-data-entry'">Create a new KeyItem</b-button>
                     <b-collapse id="collapse-data-entry">
                         <p>You can create key items to make players progress in quests or enter your server's restricted areas.</p>
                         <b-row>
@@ -134,6 +134,7 @@ export default {
             checkedList: [],
             selectedProduct: null,
             myCreatedKeyItems: [],
+            myChipPoolItems: [],
             newProductOptions: [],
             newProductCost: 1,
             newProductType: "",
@@ -266,7 +267,6 @@ export default {
                 const alert = { message: value.name + " created successfully!", type: 'success', title: 'KeyItem Created'};
                 this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
 
-                self.newProductOptions.push(value);
                 self.myCreatedKeyItems.push(value);
                 self.newKeyItem = {name:"", description:""};
             }).catch(err => {
@@ -282,41 +282,84 @@ export default {
         hideCreateProduct() {
             this.showCreateProduct = false;
         },
-    },
-    mounted() {
-        console.log("mounted");
-        
-        // Refresh CREATED key items
-        this.newProductOptions = [{value: null, text: "Please select an item to sell", disabled: true}];
+        rebuildProductOptions() {
+            // reset product options list
+            this.newProductOptions = [{value: null, text: "Please select an item to sell", disabled: true}];
 
+            // Refresh CREATED key items
+            let keyItemGroup = {
+                label: "KeyItems",
+                options: []
+            };
+
+            this.myCreatedKeyItems.forEach(keyitem => {
+                keyItemGroup.options.push({
+                    text: keyitem.name,
+                    value: keyitem
+                });
+            });
+
+            this.newProductOptions.push(keyItemGroup);
+
+            // Refresh AVAILABLE pool
+            let cardItemGroup = {
+                label: "Chip Pool",
+                options: []
+            };
+
+            this.myChipPoolItems.forEach(item => {
+                cardItemGroup.options.push({
+                    text: item.name,
+                    value: item
+                });
+            });
+
+            this.newProductOptions.push(cardItemGroup);
+        }
+    },
+    watch: {
+        myCreatedKeyItems() {
+            this.rebuildProductOptions();
+        },
+        myChipPoolItems() {
+            this.rebuildProductOptions();
+        }
+    },
+    mounted() {        
+        let self = this;
+
+        // refresh created key items list
         this.$api.get.keyItemsCreated()
         .then(response => {
             let payload = response.data;
-
-            let self = this;
 
             payload.data.forEach(item=>{
                 let keyitem = {
                     id: item._id,
                     name: item.name,
-                    description: item.description
-                };
-
-                // todo: support cards from chip pool
-                let option = {
-                    value: { id: item._id, description: item.description, type: "KeyItem" },
-                    text: item.name
+                    description: item.description,
+                    type: "KeyItem"
                 };
 
                 self.myCreatedKeyItems.push(keyitem);
-                self.newProductOptions.push(option);
             });
         }).catch(err => {
             let alert = { message: err, type: "danger", title: "Internal Error" };
             this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
         });
 
-        // Refresh folders
+        // refresh pool list
+        this.$store.state.user.pool.forEach(id=>{
+            self.$api.prefetchCardById(id, card=>{
+                self.myChipPoolItems.push({
+                    name: card.name + " " + card.code,
+                    id: id,
+                    type: "Card"
+                });
+            });
+        });
+
+        // Refresh products list
         this.$api.get.productsList()
         .then(response => {
             let payload = response.data;

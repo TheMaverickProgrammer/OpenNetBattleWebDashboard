@@ -36,6 +36,7 @@ export default {
     methods: {
         fetch() {
             this.busy = true;
+            this.userPoolList = [];
 
             // First time loading table get everything, then `updated` will be set to Date.now()
             this.$api.get.cardsAfterDate(this.lastUpdated).then(response => {
@@ -65,6 +66,7 @@ export default {
         },
         handleRefetch() {
             this.lastUpdated = 0;
+            this.userPoolList = [];
             this.$store.dispatch('cards/clearCards');
             this.fetch();
         }
