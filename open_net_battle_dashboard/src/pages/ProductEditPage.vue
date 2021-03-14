@@ -19,13 +19,19 @@
                                 <b-form @submit.stop.prevent="handleProductCreate">
                                     <b-row>
                                         <b-col cols="3">
-                                            <b-form-input placeholder="ItemId" required/>
+                                            <b-form-select v-model="selectedProduct" :options="newProductOptions" required></b-form-select>
                                         </b-col>
                                         <b-col cols="3">
-                                            <b-form-input placeholder="Cost" required/>
+                                            <b-form-input v-model="newProductCost" placeholder="Cost" required/>
                                         </b-col>
                                         <b-col cols="2">
-                                            <b-button variant="outline-success" type="submit"><b-icon-check/>Create</b-button>
+                                            <b-button
+                                                :disabled="selectedProduct==null"
+                                                v-on:click="createNewProduct()"  
+                                                variant="outline-success" 
+                                                type="submit">
+                                                <b-icon-check/>Create
+                                            </b-button>
                                         </b-col>
                                     </b-row>
                                 </b-form>
@@ -51,7 +57,63 @@
             <b-tab title="My Tx"> 
             </b-tab>
             <b-tab title="Create KeyItems"> 
+                <b-container>
+                    <h1>My Created KeyItems&nbsp;<b-icon-puzzle/></h1>
+                    <b-card v-if="myCreatedKeyItems.length == 0">You have no created key items</b-card>
+                    <b-table striped hover caption-top :items="myCreatedKeyItems" :fields="['name', 'description']">
+                    </b-table>
+                    <b-button class="btn-margin" variant="primary" v-b-toggle="'collapse-data-entry'">Create a new KeyItem</b-button>
+                    <b-collapse id="collapse-data-entry">
+                        <p>You can create key items to make players progress in quests or enter your server's restricted areas.</p>
+                        <b-row>
+                            <b-col sm="1">
+                                <label for="newKeyItemName">Name:</label>
+                            </b-col>
+                            <b-col sm="4">
+                                <b-form-input 
+                                    id="newKeyItemName" 
+                                    v-model="newKeyItem.name"
+                                    :state="newKeyItemNameState"
+                                    aria-describedby="name-feedback"
+                                    placeholder="Your new item name"
+                                    trim
+                                ></b-form-input>
 
+                                <!-- This will only be shown if the preceding input has an invalid state -->
+                                <b-form-invalid-feedback id="name-feedback">
+                                    Enter at least 3 letters
+                                </b-form-invalid-feedback>
+                            </b-col>
+                            <b-col sm="1">
+                                <label for="newKeyItemDesc">Description:</label>
+                            </b-col>
+                            <b-col sm="4">
+                                <b-form-input 
+                                    id="newKeyItemDesc" 
+                                    v-model="newKeyItem.description"
+                                    :state="newKeyItemDescState"
+                                    aria-describedby="desc-feedback"
+                                    placeholder="Your item's description"
+                                    trim
+                                ></b-form-input>
+
+                                <!-- This will only be shown if the preceding input has an invalid state -->
+                                <b-form-invalid-feedback id="desc-feedback">
+                                    Enter at least 5 descriptive words
+                                </b-form-invalid-feedback>
+                            </b-col>
+                            <b-col>
+                                <b-button 
+                                    v-on:click="addKeyItem()" 
+                                    variant="success" 
+                                    class="btn-margin"
+                                    :disabled="!(newKeyItemDescState && newKeyItemNameState)">
+                                Create
+                                </b-button>
+                            </b-col>
+                        </b-row>
+                    </b-collapse>
+                </b-container>
             </b-tab>
         </b-tabs>
     </div>
@@ -68,7 +130,13 @@ export default {
             numberOfColumns: 4,
             lastUpdated: 0,
             showCreateProduct: false,
-            checkedList: []
+            checkedList: [],
+            selectedProduct: null,
+            myCreatedKeyItems: [],
+            newProductOptions: [],
+            newProductCost: 1,
+            newProductType: "",
+            newKeyItem: {name:"", description:""}
         }
     },
     components: {
@@ -82,10 +150,76 @@ export default {
         },
         getProductsList() {
             return this.$store.state.products.list;
+        },
+        newKeyItemNameState() {
+            // at least 3 letters
+            return this.newKeyItem.name.length > 2 ? true : false;
+        },
+        newKeyItemDescState() {
+            let str = this.newKeyItem.description;
+            let arr = str.split(/[ ,]+/);
+
+            // at least 5 descriptive words
+            return arr.length > 4 ? true : false;
         }
         //...mapGetters('products', ['getProductsList'])
     },
     methods: {
+        createNewProduct() {
+            if(this.newProductCost < 1) {
+                const alert = { message: "Cost most be a nonzero positive number", type: 'danger', title: 'Bad Cost'};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+                return;
+            }
+
+            let newProductItem = {
+                itemId: this.selectedProduct.id,
+                monies: this.newProductCost,
+                type: this.selectedProduct.type
+            };
+
+            console.log(JSON.stringify(this.selectedProduct));
+
+            let self = this;
+
+            this.$api.add.product(newProductItem)
+            .then(response =>{
+                let value = response.data.data;
+
+                const alert = { message: "Product created successfully!", type: 'success', title: 'Product Created'};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+
+                self.newProductCost = 1;
+                self.selectedProduct = null;
+
+                this.$store.dispatch('products/addProduct', value, {namespaced: true});
+            }).catch(err => {
+                console.log(JSON.stringify(err.response.data.error));
+                // An error occurred
+                const alert = { message: err.response.data.error, type: 'danger', title: 'Internal Error'};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+            });
+        },
+        addKeyItem() {
+            let self = this;
+
+            this.$api.add.keyItem(this.newKeyItem)
+            .then(response =>{
+                let value = response.data.data;
+
+                const alert = { message: value.name + " created successfully!", type: 'success', title: 'KeyItem Created'};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+
+                self.newProductOptions.push(value);
+                self.myCreatedKeyItems.push(value);
+                self.newKeyItem = {name:"", description:""};
+            }).catch(err => {
+                console.log(JSON.stringify(err.response.data.error));
+                // An error occurred
+                const alert = { message: err.response.data.error, type: 'danger', title: 'Internal Error'};
+                this.$store.dispatch('alerts/addAlert', alert, {namespaced: true});
+            });
+        },
         toggleCreateProduct() {
             this.showCreateProduct = !this.showCreateProduct;
         },
@@ -153,6 +287,36 @@ export default {
     mounted() {
         console.log("mounted");
         
+        // Refresh CREATED key items
+        this.newProductOptions = [{value: null, text: "Please select an item to sell", disabled: true}];
+
+        this.$api.get.keyItemsCreated()
+        .then(response => {
+            let payload = response.data;
+
+            let self = this;
+
+            payload.data.forEach(item=>{
+                let keyitem = {
+                    id: item._id,
+                    name: item.name,
+                    description: item.description
+                };
+
+                // todo: support cards from chip pool
+                let option = {
+                    value: { id: item._id, description: item.description, type: "KeyItem" },
+                    text: item.name
+                };
+
+                self.myCreatedKeyItems.push(keyitem);
+                self.newProductOptions.push(option);
+            });
+        }).catch(err => {
+            let alert = { message: err, type: "danger", title: "Internal Error" };
+            this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+        });
+
         // Refresh folders
         this.$api.get.productsList()
         .then(response => {
@@ -186,6 +350,11 @@ export default {
 
 .scrollable {
     overflow-y: scroll;
+}
+
+.btn-margin {
+    margin-bottom: 10px;
+    margin-top: 10px;
 }
 
 ul {
