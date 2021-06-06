@@ -2,9 +2,9 @@
     <div class="app-background">
         <!-- app contents begin -->
         <b-tabs >
-            <b-tab title="My Shop" active>
+            <b-tab title="Shop" active>
                 <div class="scrollable">
-                <h1>My Shop&nbsp;<b-icon-bag/></h1>
+                <h1>Server Shop&nbsp;<b-icon-bag/></h1>
                 <b-container fluid class="action-panel">
                     <b-row>
                         <b-col align-self="start" cols="2">
@@ -55,12 +55,12 @@
                 <b-card v-if="getProductsList.length == 0">This place is empty</b-card>
                 </div>
             </b-tab>
-            <b-tab title="My Tx"> 
+            <b-tab title="Tx"> 
             </b-tab>
-            <b-tab title="Create KeyItems"> 
-                <h1>My Created KeyItems&nbsp;<b-icon-puzzle/></h1>
+            <b-tab title="KeyItems"> 
+                <h1>Server KeyItems&nbsp;<b-icon-puzzle/></h1>
                 <b-card v-if="myCreatedKeyItems.length == 0">You have no created key items</b-card>
-                <b-table striped hover caption-top :items="myCreatedKeyItems" :fields="['name', 'description']">
+                <b-table striped hover caption-top :items="myCreatedKeyItems" :fields="['name', 'description', 'id']">
                 </b-table>
                 <b-button class="btn-margin" variant="primary" v-b-toggle="'collapse-data-entry'">Create a new KeyItem</b-button>
                 <b-container>
@@ -134,7 +134,7 @@ export default {
             checkedList: [],
             selectedProduct: null,
             myCreatedKeyItems: [],
-            myChipPoolItems: [],
+            cardsForSale: [],
             newProductOptions: [],
             newProductCost: 1,
             newProductType: "",
@@ -301,13 +301,13 @@ export default {
 
             this.newProductOptions.push(keyItemGroup);
 
-            // Refresh AVAILABLE pool
+            // Refresh cards
             let cardItemGroup = {
-                label: "Chip Pool",
+                label: "Cards",
                 options: []
             };
 
-            this.myChipPoolItems.forEach(item => {
+            this.cardsForSale.forEach(item => {
                 cardItemGroup.options.push({
                     text: item.name,
                     value: item
@@ -321,7 +321,7 @@ export default {
         myCreatedKeyItems() {
             this.rebuildProductOptions();
         },
-        myChipPoolItems() {
+        cardsForSale() {
             this.rebuildProductOptions();
         }
     },
@@ -348,15 +348,22 @@ export default {
             this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
         });
 
-        // refresh pool list
-        this.$store.state.user.pool.forEach(id=>{
-            self.$api.prefetchCardById(id, card=>{
-                self.myChipPoolItems.push({
-                    name: card.name + " " + card.code,
-                    id: id,
-                    type: "Card"
+        // refresh library list
+        this.$api.get.cardsAfterDate(0).then((response)=> {
+            response.data.data.forEach(card=>{
+                // cache this card info
+                this.$api.prefetchCardById(card._id, detail=>{
+                    self.cardsForSale.push({
+                        name: detail.name + " " + card.code,
+                        id: detail.id,
+                        type: "Card"
+                    });
                 });
             });
+        }).catch(err => {
+            console.log(err);
+            let alert = { message: err, type: "danger", title: "Internal Error" };
+            this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
         });
 
         // Refresh products list
