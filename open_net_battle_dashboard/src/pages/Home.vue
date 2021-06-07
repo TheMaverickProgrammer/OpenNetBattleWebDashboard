@@ -196,6 +196,7 @@ export default {
 
                 // mongo error
                 if(typeof message.errmsg !== 'undefined') {
+                    // NOTE: will this change?
                     if(String(message.code) === "11000") {
                         // The only possible duplicate is username
                         message = "Username already exists!"

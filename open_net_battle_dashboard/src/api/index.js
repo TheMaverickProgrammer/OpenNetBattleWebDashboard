@@ -9,6 +9,7 @@ const base_url = protocol + config.domain + ":" + config.port + "/" + config.ver
 const resources = {
     LOGIN: base_url + "/login",
     LOGOUT: base_url + "/logout",
+    RESET_PASS: base_url + "/reset-pass",
     CARDS: base_url + "/cards",
     ADMINS: base_url + "/admins",
     USERS: base_url + "/users",
@@ -42,6 +43,12 @@ const api = {
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
+        resetPassword(email) {
+            return axios.post(resources.RESET_PASS + "/" + email,
+                {
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        }
     },
     /* 
     demoteAdmin(userId) {

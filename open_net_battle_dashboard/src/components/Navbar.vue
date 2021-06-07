@@ -11,7 +11,7 @@
                 <b-nav-item :to="{ path: '/cards' }" class="no-link">My Chip Pool</b-nav-item>
                 <b-nav-item :to="{ path: '/public-folders'}" class="no-link">Public Folders</b-nav-item>
                 <b-nav-item :to="{ path: '/combos' }" class="no-link">Combos</b-nav-item>
-                <b-nav-item :to="{ path: '/economy'}" class="no-link">Economy</b-nav-item>
+                <b-nav-item v-if="$store.state.user.isAdmin" :to="{ path: '/economy'}" class="no-link">Economy</b-nav-item>
             </b-navbar-nav>
 
             <!-- Right aligned nav items -->

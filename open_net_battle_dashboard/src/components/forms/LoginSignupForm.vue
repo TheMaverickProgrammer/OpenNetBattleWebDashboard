@@ -1,5 +1,13 @@
 <template>
   <div class="login-reg-panel">
+      <b-modal 
+          ref="forgot-pass-modal" 
+          title="Reset Password"
+          @ok="sendResetPassRequest">
+          <p>An email will be sent to you - did you forget that too?</p>
+          <b-input placeholder="Enter your email e.g. 'iamforgetful@gmail.com'" v-model="email"/>
+      </b-modal>
+
       <!-- login question toggle -->
       <div class="login-info-box" v-if="!showLoginForm">
         <h2>I already have an account</h2>
@@ -10,6 +18,9 @@
       <div class="register-info-box" v-if="showLoginForm">
         <h2>Don't have an account?</h2>
         <b-button id="label-login" for="log-login-show" @click="onToggleForm">Signup</b-button>
+        <small>
+            uh I <a class="link" @click="showForgotPassModal">forgot my password</a>.
+        </small>
       </div>
 
       <div :class="{ 'white-panel': true, 'right-log': !showLoginForm}">
@@ -78,31 +89,32 @@ export default {
       UserForm
     },
     data() {
-        return {
-            busy: false,
-            processing: false,
-            counter: 1,
-            interval: null,
-            user: { username: "", password: ""},
-            confirmPassword: "",
-            showLoginForm: true
-        }
+      return {
+        busy: false,
+        processing: false,
+        counter: 1,
+        interval: null,
+        user: { username: "", password: ""},
+        confirmPassword: "",
+        showLoginForm: true,
+        email: ""
+      }
     },
     beforeDestroy() {
-        this.clearInterval()
+      this.clearInterval()
     },
     methods: {
         onToggleForm(e) {
-            e.preventDefault();
+          e.preventDefault();
 
-            if(this.busy) return;
+          if(this.busy) return;
 
-            this.showLoginForm = !this.showLoginForm;
+          this.showLoginForm = !this.showLoginForm;
         },
         clearInterval() {
             if (this.interval) {
-                clearInterval(this.interval)
-                this.interval = null
+              clearInterval(this.interval)
+              this.interval = null
             }
         },
         autoLogin() {
@@ -127,47 +139,47 @@ export default {
             }),
             autoLogin, // if true, silences errors
             (response) => {
-                this.$store.dispatch('loginUser', response.data.user);
-                let alert = {};
-                
-                if(autoLogin) {
-                  alert = { message: "Welcome back, " + response.data.user.username + "!", type: "success", title: "Autologin" };
-                } else {
-                  alert = { message: "Welcome to cyberworld, " + response.data.user.username + "!", type: "success" };
-                }
+              this.$store.dispatch('loginUser', response.data.user);
+              let alert = {};
+              
+              if(autoLogin) {
+                alert = { message: "Welcome back, " + response.data.user.username + "!", type: "success", title: "Autologin" };
+              } else {
+                alert = { message: "Welcome to cyberworld, " + response.data.user.username + "!", type: "success" };
+              }
 
-                this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
             })
           .finally(() => {
-              this.clearInterval();
-              this.busy = this.processing = false;
+            this.clearInterval();
+            this.busy = this.processing = false;
           });
 
           this.clearInterval()
           this.interval = setInterval(() => {
-              if (this.counter < 20) {
-                  this.counter = this.counter + 1
-              } else {
-                  this.clearInterval()
-                  this.$nextTick(() => {
-                      this.busy = this.processing = false;
-                      this.cancelRequest("Login timeout");
-                  })
-              }
+            if (this.counter < 20) {
+              this.counter = this.counter + 1
+            } else {
+              this.clearInterval()
+              this.$nextTick(() => {
+                this.busy = this.processing = false;
+                this.cancelRequest("Login timeout");
+              })
+            }
           }, 350)
         },
         cancelLoginAction() {
-            this.$emit('cancel-action');
+          this.$emit('cancel-action');
         },
         handleSignupAction(account, confirmPassword) {
           if(confirmPassword.length == 0 || account.password.length == 0)  {
-              let alert = {message: "Enter both password fields", type: "danger", title: "Choose a password"};
-              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-              return;
+            let alert = {message: "Enter both password fields", type: "danger", title: "Choose a password"};
+            this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+            return;
           } else if(account.password != confirmPassword) {
-              let alert = {message: "Passwords did not match", type: "danger", title: "WRITE IT DOWN SOMEWHERE"};
-              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-              return;
+            let alert = {message: "Passwords did not match", type: "danger", title: "WRITE IT DOWN SOMEWHERE"};
+            this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+            return;
           }
 
           this.busy = true;
@@ -175,12 +187,30 @@ export default {
 
           this.$api.signup(account, 
           () => {
-              let alert = {message: "You can now log in with your new account", type: "info"};
-              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
-              this.showLoginForm = true;
+            let alert = {message: "You can now log in with your new account", type: "info"};
+            this.$store.dispatch('alerts/addAlert', alert, { namespaced: true });
+            this.showLoginForm = true;
           }).finally(() => {
-              this.busy = this.processing = false;
+            this.busy = this.processing = false;
           });
+        },
+        showForgotPassModal() {
+          this.$refs['forgot-pass-modal'].show()
+        },
+        sendResetPassRequest() {
+          let email = this.email;
+          this.email = "";
+
+          if(email != "") {
+            this.$api.auth.resetPassword(email).then(()=>{
+              let alert = {message: "Password reset request sent", type: "success"};
+              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true });
+            }).catch(err => {
+              console.log("password request failed: " + err);
+              let alert = {message: "Request failed", type: "danger"};
+              this.$store.dispatch('alerts/addAlert', alert, { namespaced: true });
+            });
+          }
         }
     }
 }
@@ -342,5 +372,14 @@ a{
 .submit {
   color : black;
   background-color: white;
+}
+
+a, .link{
+  color: #17a2b8 !important;
+}
+
+.link:hover {
+  text-decoration: underline;
+  cursor:pointer;
 }
 </style>

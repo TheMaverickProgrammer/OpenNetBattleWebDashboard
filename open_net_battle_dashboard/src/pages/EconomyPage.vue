@@ -407,42 +407,46 @@ export default {
             this.lastUpdated = Date.now();
         });
 
-        // Refresh txs list
-        // NOTE: THIS IS VERY UNOPTIMIZED!
-        this.$api.get.txAfterDate(0).then(response=>{
-            response.data.data.forEach(tx=>{
-                self.$api.prefetchProductName(tx.product, name=>{
-                    tx.name = name;
-                    tx.created = self.getDate(tx.created);
+        // NOTE: Need to rewrite the backend to only show this info to admin?
+        // In the future no one will have accounts. Putting this here as a note to myself...
+        if(this.$store.state.user.isAdmin) {
+            // Refresh txs list
+            // NOTE: THIS IS VERY UNOPTIMIZED!
+            this.$api.get.txAfterDate(0).then(response=>{
+                response.data.data.forEach(tx=>{
+                    self.$api.prefetchProductName(tx.product, name=>{
+                        tx.name = name;
+                        tx.created = self.getDate(tx.created);
 
-                    let needsPrefetch = typeof self.userNameHash[tx.from] == 'undefined'
-                                        || typeof self.userNameHash[tx.to] == 'undefined';
+                        let needsPrefetch = typeof self.userNameHash[tx.from] == 'undefined'
+                                            || typeof self.userNameHash[tx.to] == 'undefined';
 
-                    if(needsPrefetch) {
-                        // we need to ask the api fror this user name and cache it
-                        let promise1 = self.$api.get.user(tx.from);
-                        let promise2 = self.$api.get.user(tx.to);
-                        
-                        Promise.all([promise1, promise2]).then(arr=>{
-                            // cache these values
-                            self.userNameHash[tx.from] = arr[0].data.data.username;
-                            tx.from = self.userNameHash[tx.from];
+                        if(needsPrefetch) {
+                            // we need to ask the api fror this user name and cache it
+                            let promise1 = self.$api.get.user(tx.from);
+                            let promise2 = self.$api.get.user(tx.to);
                             
-                            self.userNameHash[tx.to] = arr[1].data.data.username;
-                            tx.to = self.userNameHash[tx.to];
+                            Promise.all([promise1, promise2]).then(arr=>{
+                                // cache these values
+                                self.userNameHash[tx.from] = arr[0].data.data.username;
+                                tx.from = self.userNameHash[tx.from];
+                                
+                                self.userNameHash[tx.to] = arr[1].data.data.username;
+                                tx.to = self.userNameHash[tx.to];
 
-                            // now add to the list
+                                // now add to the list
+                                self.txs.push(tx);
+                            });
+                        } else {
+                            // use the cache
+                            tx.from = self.userNameHash[tx.from];
+                            tx.to = self.userNameHash[tx.to];
                             self.txs.push(tx);
-                        });
-                    } else {
-                        // use the cache
-                        tx.from = self.userNameHash[tx.from];
-                        tx.to = self.userNameHash[tx.to];
-                        self.txs.push(tx);
-                    }
+                        }
+                    });
                 });
             });
-        });
+        }
     }
 }
 </script>

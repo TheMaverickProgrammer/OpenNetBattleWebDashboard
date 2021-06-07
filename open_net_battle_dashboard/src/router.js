@@ -100,9 +100,9 @@ export default new Router({
         name: 'PublicFolderListPage',
         component: PublicFolderListPage,
         meta: {
-        breadcrumb: [
-            { name: 'Home', link: '/'},
-            { name: 'Public Folders' }
+            breadcrumb: [
+                { name: 'Home', link: '/'},
+                { name: 'Public Folders' }
             ]
         }
     },
@@ -111,9 +111,9 @@ export default new Router({
         name: 'ComboListPage',
         component: ComboListPage,
         meta: {
-        breadcrumb: [
-            { name: 'Home', link: '/'},
-            { name: 'Combos' }
+            breadcrumb: [
+                { name: 'Home', link: '/'},
+                { name: 'Combos' }
             ]
         }
     },
@@ -122,9 +122,10 @@ export default new Router({
         name: 'EconomyPage',
         component: EconomyPage,
         meta: {
-        breadcrumb: [
-            { name: 'Home', link: '/'},
-            { name: 'Economy' }
+            requiresAuth: true,
+            breadcrumb: [
+                { name: 'Home', link: '/'},
+                { name: 'Economy' }
             ]
         }
     }

@@ -44,6 +44,24 @@ import 'bootstrap-vue/dist/bootstrap-vue.css'
 /* eslint-disable no-new */
 Vue.config.productionTip = false
 
+// configure the router
+router.beforeEach((to, from, next) => {
+  if (to.matched.some(record => record.meta.requiresAuth)) {
+    // this route requires auth, check if logged in
+    // if not, redirect to login page.
+    if (!store.state.user.isAdmin) {
+      next({
+        path: '/',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else {
+    next() // make sure to always call next()!
+  }
+})
+
 export const bus = new Vue({
   el: '#app',
   router,
