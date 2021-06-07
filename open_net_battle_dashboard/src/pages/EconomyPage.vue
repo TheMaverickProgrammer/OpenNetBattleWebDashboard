@@ -127,7 +127,7 @@ import ProductItem from "@/components/ProductItem";
 // import { mapGetters } from 'vuex'
 
 export default {
-    name: "ProductEditPage",
+    name: "EconomyPage",
     data() {
         let fields = [
             { key: 'created', sortable: true },

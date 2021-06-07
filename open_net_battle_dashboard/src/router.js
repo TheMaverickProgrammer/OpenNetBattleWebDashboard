@@ -8,7 +8,7 @@ import PublicFolderListPage from '@/pages/PublicFolderListPage'
 import ComboListPage from '@/pages/ComboListPage'
 import CardLibraryViewPage from '@/pages/CardLibraryViewPage'
 import CodeEditPage from '@/pages/CodeEditPage'
-import ProductEditPage from '@/pages/ProductEditPage'
+import EconomyPage from '@/pages/EconomyPage'
 import KeyItemListPage from '@/pages/KeyItemListPage'
 
 Vue.use(Router)
@@ -119,8 +119,8 @@ export default new Router({
     },
     {
         path: '/economy',
-        name: 'ProductEditPage',
-        component: ProductEditPage,
+        name: 'EconomyPage',
+        component: EconomyPage,
         meta: {
         breadcrumb: [
             { name: 'Home', link: '/'},

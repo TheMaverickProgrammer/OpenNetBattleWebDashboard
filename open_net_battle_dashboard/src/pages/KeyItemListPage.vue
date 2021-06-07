@@ -65,6 +65,7 @@ export default {
 
 .hint {
     padding: 10px;
+    display: block;
 }
 
 ul {
