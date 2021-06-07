@@ -144,8 +144,7 @@ Element stylings
 }
 
 .image {
-    margin-left:30%;
-    margin-right:25%;
+    margin: auto;
     border-radius: 5px;
     border-style: solid;
     border-color:black;

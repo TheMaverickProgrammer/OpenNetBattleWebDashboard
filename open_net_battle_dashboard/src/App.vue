@@ -72,18 +72,28 @@ export default {
   height:100vh;
 	min-height:550px;
   position:relative;
-  overflow-y:hidden;
 	background-image: url(./assets/ow.gif);
 	background-repeat: no-repeat;
 	background-size:cover;
 	background-position:center;
+  overflow-y:hidden;
 }
 
 #app-content {
   margin-left: 15%;
   margin-right: 15%;
   height: 100vh;
+  overflow-y:auto;
 }
+
+@media (max-width: 800px) {
+  #app-content {
+    margin-left: 0%;
+    margin-right: 0%;
+    height: scroll;
+  }
+}
+
 .app-background {
   background-color:white;
 }

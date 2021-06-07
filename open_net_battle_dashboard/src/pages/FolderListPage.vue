@@ -33,10 +33,10 @@
             <b-container fluid class="action-panel">
                 <b-row>
                     <b-col align-self="start" cols="2">
-                        <b-button variant="outline-success" block @click="toggleCreateFolder"><b-icon icon="folder-plus"/>New</b-button>
+                        <b-button variant="outline-success" block @click="toggleCreateFolder"><b-icon icon="folder-plus"/><div class="no-mobile-text">New</div></b-button>
                     </b-col>
                     <b-col cols="2">
-                        <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/>Delete</b-button>
+                        <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/><div class="no-mobile-text">Delete</div></b-button>
                     </b-col>
                 </b-row>
                 <b-collapse id="folder-collapse" v-model="showCreateFolder">
@@ -59,7 +59,7 @@
 
             <hr>
 
-            <ul :style="gridStyle" class="folder-card-list">
+            <ul class="folder-card-list row col-m-6">
                 <li v-bind:key="folder.id" v-for="folder in getFolders">
                     <FolderItem 
                     checkable
@@ -301,8 +301,12 @@ export default {
 </script>
 
 <style scoped>
+@media (max-width: 800px) {
+    .no-mobile-text { display:none; }  
+}
+
 .folder-card-list {
-  display: grid;
+  display: flex;
   grid-gap: 1em;
   padding-bottom: 20px;
 }

@@ -24,7 +24,7 @@
                 </b-container>
             </template>
             <b-card-text>
-                <div v-if="type=='Card'">
+                <div v-if="type=='Card'" style="text-align:center">
                     <CardInspectItem :card="getAsCard" v-if="getAsCard" mini/>
                     <b-spinner v-if="!getAsCard"/>
                 </div>

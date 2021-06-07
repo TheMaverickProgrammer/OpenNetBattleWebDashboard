@@ -50,8 +50,8 @@
       </template>
 
       <!-- A custom formatted column -->
-      <template v-slot:cell(actions)="data" v-if="hasActions">
-        <p class="h3 mb-2" @click="$emit('remove-cards', [data.item])">
+      <template v-slot:cell(action)="data" v-if="hasActions">
+        <p class="h2" @click="$emit('remove-cards', [data.item])">
           <b-icon variant="danger" icon="x-circle" class="action" v-if="removable" v-b-tooltip.hover.top="'Remove card'"/>
         </p>
       </template>
@@ -98,7 +98,7 @@
 
       <!-- A custom formatted column -->
       <template v-slot:cell(verboseDescription)="data">
-        <a href="#" @click="showModal(data.item)">Open in link</a>
+        <a href="#" @click="showModal(data.item)">Open</a>
       </template>
 
       <!-- Example scoped slot for select state illustrative purposes -->
@@ -196,28 +196,32 @@ export default {
     },
     data() {
       let fields = [
-        { key: 'image', sortable: false },
-        { key: 'icon', sortable: false },
+        { key: 'image', sortable: false, class: "d-none d-md-table-cell" },
+        { key: 'icon', sortable: false, class: "d-none d-md-table-cell" },
         { key: 'name', sortable: true },
-        { key: 'damage', sortable: true },
+        { key: 'damage', sortable: true, class: "d-none d-md-table-cell"},
         { key: 'code', sortable: true },
-        { key: 'element', sortable: true},
-        { key: 'secondaryElement', label: '2nd Element', sortable: true },
-        { key: 'limit', sortable: true },
-        { key: 'description', sortable: false },
+        { key: 'element', sortable: true, class: "d-none d-md-table-cell"},
+        { key: 'secondaryElement', label: '2nd Element', sortable: true, class: "d-none d-md-table-cell" },
+        { key: 'limit', sortable: true, class: "d-none d-md-table-cell" },
+        { key: 'description', sortable: false, class: "d-none d-md-table-cell" },
         { key: 'verboseDescription', label: 'More', sortable: false}
       ];
 
       if(this.removable) {
-        fields = [ 'actions', ...fields];
+        fields = [ 'action', ...fields];
       }
+
+      let perPage = this.getScreenWidth() > 800? 20 : 4;
+
+      console.log("vssHeight: " + this.getScreenWidth());
 
       return {
         preview: { name: "" },
         fields: fields,
         selectMode: 'multi',
         selected: [],
-        perPage: 20,
+        perPage: perPage,
         currentPage: 1,
         rows: 0,
         inspectCard: null,

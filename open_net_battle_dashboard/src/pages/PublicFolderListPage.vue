@@ -23,7 +23,7 @@
 
         <!-- app contents begin -->
         <div class="app-background">
-            <ul :style="gridStyle" class="folder-card-list" v-if="getFolders.length>0">
+            <ul class="folder-card-list row col-m-6" v-if="getFolders.length>0">
                 <li v-bind:key="folder.id" v-for="folder in getFolders">
                     <PublicFolderItem 
                     :id="folder.id"
@@ -152,10 +152,9 @@ export default {
 
 <style scoped>
 .folder-card-list {
-  display: grid;
+  display: flex;
   grid-gap: 1em;
   padding-bottom: 20px;
-  padding-top: 20px;
 }
 
 ul {

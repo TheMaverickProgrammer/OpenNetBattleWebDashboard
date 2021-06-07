@@ -117,6 +117,7 @@ export default {
 <style scoped>
 .folder-card {
     filter: drop-shadow(8px 8px 5px rgba(0,0,0,0.25));
+    min-width: 340px;
 }
 
 .black {

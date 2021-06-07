@@ -1,6 +1,8 @@
 import axios from 'axios'
 import config from '@/config'
 
+axios.defaults.withCredentials = true;
+
 const protocol = config.secured ? "https://" : "http://";
 const base_url = protocol + config.domain + ":" + config.port + "/" + config.version;
 
@@ -15,7 +17,8 @@ const resources = {
     KEYITEMS: base_url + "/keyitems",
     PUBLIC_FOLDERS: base_url + '/public-folders',
     CARD_MODELS: base_url + '/card-properties',
-    COMBOS: base_url + '/combos'
+    COMBOS: base_url + '/combos',
+    TXS: base_url + '/tx'
 }
 
 const folderMaxLength = 30;
@@ -26,8 +29,8 @@ const api = {
             return axios.get(resources.LOGIN,
                 {
                     cancelToken: cancelToken || null,
-                    withCredentials: true,
                     auth: { username: username, password: password },
+                    crossdomain: true,
                     headers: { 
                         'Content-Type': 'application/json',
                     },
@@ -36,7 +39,6 @@ const api = {
         logout() {
             return axios.get(resources.LOGOUT,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -52,63 +54,54 @@ const api = {
         card(id) {
             return axios.get(resources.CARDS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         cardModel(id) {
             return axios.get(resources.CARD_MODELS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         folder(id) {
             return axios.get(resources.FOLDERS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         user(id) {
             return axios.get(resources.USERS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         combo(id) {
             return axios.get(resources.COMBOS + "/" + id, 
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         keyItem(id) {
             return axios.get(resources.KEYITEMS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' }
                 })
         },
         productsList() {
             return axios.get(resources.PRODUCTS,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         keyItemsCreated() {
             return axios.get(resources.KEYITEMS, 
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' }
                 })
         },
         keyItemsOwned() {
             return axios.get(resources.KEYITEMS + "/owned",
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' }
                 })
         },
@@ -120,7 +113,6 @@ const api = {
             return axios.get(resources.CARDS + "/since/" + Math.floor(milli/1000),
                 {
                     cancelToken: cancelToken || null,
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -128,7 +120,6 @@ const api = {
             return axios.get(resources.FOLDERS + "/since/" + Math.floor(milli/1000),
                 {
                     cancelToken: cancelToken || null,
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -136,7 +127,6 @@ const api = {
             return axios.get(resources.USERS + "/since/" + Math.floor(milli/1000),
                 {
                     cancelToken: cancelToken || null,
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -144,7 +134,6 @@ const api = {
             return axios.get(resources.PUBLIC_FOLDERS + "/since/" + Math.floor(milli/1000),
                 {
                     cancelToken: cancelToken || null,
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -152,7 +141,6 @@ const api = {
             return axios.get(resources.COMBOS + "/since/" + Math.floor(milli/1000),
                 {
                     cancelToken: cancelToken || null,
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -160,7 +148,13 @@ const api = {
             return axios.get(resources.PRODUCTS + "/since/" + Math.floor(milli/1000), 
                 {
                     cancelToken: cancelToken || null,
-                    withCredentials: true,
+                    headers: { 'Content-Type': 'application/json' },
+                })
+        },
+        txAfterDate(milli, cancelToken) {
+            return axios.get(resources.TXS + "/since/" + Math.floor(milli/1000), 
+                {
+                    cancelToken: cancelToken || null,
                     headers: { 'Content-Type': 'application/json' },
                 })
         }
@@ -170,7 +164,6 @@ const api = {
             return axios.post(resources.CARD_MODELS,
                 cardModel,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -178,7 +171,6 @@ const api = {
             return axios.post(resources.FOLDERS,
                 folder,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -186,7 +178,6 @@ const api = {
             return axios.post(resources.PUBLIC_FOLDERS,
                 folder,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -194,7 +185,6 @@ const api = {
             return axios.post(resources.USERS,
                 user,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -202,7 +192,6 @@ const api = {
             return axios.post(resources.COMBOS,
                 combo,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -210,7 +199,6 @@ const api = {
             return axios.post(resources.PRODUCTS,
                 product,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -218,7 +206,6 @@ const api = {
             return axios.post(resources.KEYITEMS,
                 keyItem, 
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' }
                 })
         } 
@@ -234,7 +221,6 @@ const api = {
             return axios.put(resources.CARD_MODELS + "/" + id,
                 copy,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -246,7 +232,6 @@ const api = {
             return axios.put(resources.USERS + "/" + id,
                 copy,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -258,7 +243,6 @@ const api = {
             return axios.put(resources.FOLDERS + "/" + id,
                 copy,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -270,7 +254,6 @@ const api = {
             return axios.put(resources.PUBLIC_FOLDERS + "/" + id,
                 copy,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -282,7 +265,6 @@ const api = {
             return axios.put(resources.COMBOS + "/" + id,
                 copy,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -294,7 +276,6 @@ const api = {
             return axios.put(resources.PRODUCTS +"/" + id,
                 copy,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
@@ -306,7 +287,6 @@ const api = {
             return axios.put(resources.KEYITEMS + "/" + id,
             copy,
             {
-                withCredentials: true,
                 headers: { 'Content-Type': 'application/json'}
             })
         }
@@ -315,56 +295,48 @@ const api = {
         card(id) {
             return axios.delete(resources.CARDS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         cardModel(id) {
             return axios.delete(resources.CARD_MODELS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         user(id) {
             return axios.delete(resources.USERS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         folder(id) {
             return axios.delete(resources.FOLDERS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         publicFolder(id) {
             return axios.delete(resources.PUBLIC_FOLDERS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         combo(id) {
             return axios.delete(resources.COMBOS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' },
                 })
         },
         product(id) {
             return axios.delete(resources.PRODUCTS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' }
                 })
         },
         keyItem(id) {
             return axios.delete(resources.KEYITEMS + "/" + id,
                 {
-                    withCredentials: true,
                     headers: { 'Content-Type': 'application/json' }
                 })
         }

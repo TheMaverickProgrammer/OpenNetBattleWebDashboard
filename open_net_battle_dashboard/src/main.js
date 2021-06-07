@@ -32,6 +32,9 @@ import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 Vue.use(BootstrapVue);
 Vue.use(IconsPlugin);
 
+import VueScreenSize from 'vue-screen-size'
+Vue.use(VueScreenSize);
+
 /*
 Vanilla js and css imports
 */

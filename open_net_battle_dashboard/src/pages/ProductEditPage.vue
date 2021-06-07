@@ -8,10 +8,10 @@
                 <b-container fluid class="action-panel">
                     <b-row>
                         <b-col align-self="start" cols="2">
-                            <b-button variant="outline-success" block @click="toggleCreateProduct"><b-icon icon="plus"/>New Product</b-button>
+                            <b-button variant="outline-success" block @click="toggleCreateProduct"><b-icon icon="plus"/><div class="no-mobile-text">New Product</div></b-button>
                         </b-col>
                         <b-col cols="2">
-                            <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/>Delete</b-button>
+                            <b-button :disabled="checkedList.length == 0" variant="outline-danger" block @click="handleDelete"><b-icon icon="trash"/><div class="no-mobile-text">Delete</div></b-button>
                         </b-col>
                     </b-row>
                     <b-collapse id="product-collapse" v-model="showCreateProduct">
@@ -40,7 +40,7 @@
                 </b-container>
 
                 <hr>
-                <ul :style="gridStyle" v-if="getProductsList.length>0" class="product-card-list">
+                <ul :style="gridStyle" v-if="getProductsList.length>0" class="product-card-list row md-6">
                     <li v-bind:key="product.id" v-for="product in getProductsList">
                         <ProductItem 
                         checkable
@@ -55,13 +55,15 @@
                 <b-card v-if="getProductsList.length == 0">This place is empty</b-card>
                 </div>
             </b-tab>
-            <b-tab title="Tx"> 
+            <b-tab title="Tx">
+                <h1>Server Transactions&nbsp;<b-icon-arrow-left-right/></h1>
+                <b-card v-if="txs.length == 0">The server has no transactions</b-card>
+                <b-table striped hover caption-top :items="txs" :fields="txFields"/>
             </b-tab>
             <b-tab title="KeyItems"> 
                 <h1>Server KeyItems&nbsp;<b-icon-puzzle/></h1>
                 <b-card v-if="myCreatedKeyItems.length == 0">You have no created key items</b-card>
-                <b-table striped hover caption-top :items="myCreatedKeyItems" :fields="['name', 'description', 'id']">
-                </b-table>
+                <b-table striped hover caption-top :items="myCreatedKeyItems" :fields="['name', 'description', 'id']"/>
                 <b-button class="btn-margin" variant="primary" v-b-toggle="'collapse-data-entry'">Create a new KeyItem</b-button>
                 <b-container>
                     <b-collapse id="collapse-data-entry">
@@ -127,7 +129,16 @@ import ProductItem from "@/components/ProductItem";
 export default {
     name: "ProductEditPage",
     data() {
+        let fields = [
+            { key: 'created', sortable: true },
+            { key: 'monies', sortable: false, class: "d-none d-md-table-cell" },
+            { key: 'name', sortable: false },
+            { key: 'from', sortable: false },
+            { key: 'to', sortable: false, class: "d-none d-md-table-cell"}
+        ];
+
         return {
+            userNameHash: [],
             numberOfColumns: 4,
             lastUpdated: 0,
             showCreateProduct: false,
@@ -135,6 +146,8 @@ export default {
             selectedProduct: null,
             myCreatedKeyItems: [],
             cardsForSale: [],
+            txs: [],
+            txFields: fields,
             newProductOptions: [],
             newProductCost: 1,
             newProductType: "",
@@ -167,6 +180,14 @@ export default {
         //...mapGetters('products', ['getProductsList'])
     },
     methods: {
+        getDate(tmz) {
+            let dateObj = new Date(tmz);
+            let month = dateObj.getUTCMonth() + 1; //months from 1-12
+            let day = dateObj.getUTCDate();
+            let year = dateObj.getUTCFullYear();
+
+            return month + "/" + day + "/" + year;
+        },
         handleCheck(product, checked) {
             let id = product.id;
             let index = this.checkedList.findIndex(productId => productId == id);
@@ -349,7 +370,7 @@ export default {
         });
 
         // refresh library list
-        this.$api.get.cardsAfterDate(0).then((response)=> {
+        this.$api.get.cardsAfterDate(0).then(response=> {
             response.data.data.forEach(card=>{
                 // cache this card info
                 this.$api.prefetchCardById(card._id, detail=>{
@@ -385,16 +406,56 @@ export default {
         }).finally(()=>{
             this.lastUpdated = Date.now();
         });
+
+        // Refresh txs list
+        // NOTE: THIS IS VERY UNOPTIMIZED!
+        this.$api.get.txAfterDate(0).then(response=>{
+            response.data.data.forEach(tx=>{
+                self.$api.prefetchProductName(tx.product, name=>{
+                    tx.name = name;
+                    tx.created = self.getDate(tx.created);
+
+                    let needsPrefetch = typeof self.userNameHash[tx.from] == 'undefined'
+                                        || typeof self.userNameHash[tx.to] == 'undefined';
+
+                    if(needsPrefetch) {
+                        // we need to ask the api fror this user name and cache it
+                        let promise1 = self.$api.get.user(tx.from);
+                        let promise2 = self.$api.get.user(tx.to);
+                        
+                        Promise.all([promise1, promise2]).then(arr=>{
+                            // cache these values
+                            self.userNameHash[tx.from] = arr[0].data.data.username;
+                            tx.from = self.userNameHash[tx.from];
+                            
+                            self.userNameHash[tx.to] = arr[1].data.data.username;
+                            tx.to = self.userNameHash[tx.to];
+
+                            // now add to the list
+                            self.txs.push(tx);
+                        });
+                    } else {
+                        // use the cache
+                        tx.from = self.userNameHash[tx.from];
+                        tx.to = self.userNameHash[tx.to];
+                        self.txs.push(tx);
+                    }
+                });
+            });
+        });
     }
 }
 </script>
 
 <style scoped>
+@media (max-width: 800px) {
+    .no-mobile-text { display:none; }  
+}
+
 .product-card-list {
-  display: grid;
+  display: flex;
   grid-gap: 1em;
   padding-bottom: 20px;
-  padding-top: 20px;
 }
 
 .scrollable {
