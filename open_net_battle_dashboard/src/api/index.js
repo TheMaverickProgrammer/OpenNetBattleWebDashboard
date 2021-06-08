@@ -48,6 +48,13 @@ const api = {
                 {
                     headers: { 'Content-Type': 'application/json' },
                 })
+        },
+        verifyResetPassword(userId, token, password) {
+            return axios.post(resources.RESET_PASS + "/verify", 
+            { userId, token, password },
+            {
+                headers: { 'Content-Type': 'application/json' },
+            })
         }
     },
     /* 

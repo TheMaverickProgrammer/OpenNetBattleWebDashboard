@@ -1,6 +1,6 @@
 <template>
     <div class="content">
-        <PrismEditor language="ts" v-model="source" :code="source" lineNumbers/>
+        <PrismEditor language="lua" v-model="source" :code="source" lineNumbers/>
         <b-card>
             <b-button variant="warning"><b-icon-cloud-upload/>Save</b-button>
         </b-card>

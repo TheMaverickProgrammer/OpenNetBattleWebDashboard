@@ -12,29 +12,19 @@ import LoginSignupForm from '@/components/forms/LoginSignupForm'
 
 export default {
     data() {
-        return {
-            show: "none"
-        }
+        return {};
     },
     methods: {
-        handleLogin() {
-            this.show = "login";
-        },
-        handleSignup() {
-            this.show = "signup";
-        },
-        handleSignupCompleted() {
-            this.show = "none";
-        },
-        handleReset() {
-            this.show = "none";
-        },
         autoLogin() {
             this.$refs.form.autoLogin();
         }
     },
     components: { 
         LoginSignupForm
+    },
+    mounted() {
+        // try auto-logging in
+        this.autoLogin();
     }
 }
 </script>

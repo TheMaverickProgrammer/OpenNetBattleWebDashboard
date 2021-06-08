@@ -46,12 +46,25 @@ Vue.config.productionTip = false
 
 // configure the router
 router.beforeEach((to, from, next) => {
+  console.log(to.path);
+  console.log(store.state.user);
+  
   if (to.matched.some(record => record.meta.requiresAuth)) {
     // this route requires auth, check if logged in
     // if not, redirect to login page.
+    if (store.state.user.username == "") {
+      next({
+        path: '/login',
+        query: { redirect: to.fullPath }
+      })
+    } else {
+      next()
+    }
+  } else if (to.matched.some(record => record.meta.requiresAdminAuth)) {
+    // this route requires admin
     if (!store.state.user.isAdmin) {
       next({
-        path: '/',
+        path: '/login',
         query: { redirect: to.fullPath }
       })
     } else {

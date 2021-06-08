@@ -4,7 +4,7 @@
           ref="forgot-pass-modal" 
           title="Reset Password"
           @ok="sendResetPassRequest">
-          <p>An email will be sent to you - did you forget that too?</p>
+          <p>An email will be sent to you - check your spam!</p>
           <b-input placeholder="Enter your email e.g. 'iamforgetful@gmail.com'" v-model="email"/>
       </b-modal>
 
@@ -149,6 +149,7 @@ export default {
               }
 
               this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});
+              this.$router.push({path:'/'});
             })
           .finally(() => {
             this.clearInterval();

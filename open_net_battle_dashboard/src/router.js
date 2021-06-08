@@ -10,15 +10,33 @@ import CardLibraryViewPage from '@/pages/CardLibraryViewPage'
 import CodeEditPage from '@/pages/CodeEditPage'
 import EconomyPage from '@/pages/EconomyPage'
 import KeyItemListPage from '@/pages/KeyItemListPage'
+import PasswordResetPage from '@/pages/PasswordResetPage'
+import Landing from '@/pages/Landing'
 
 Vue.use(Router)
 
 export default new Router({
   routes: [
     {
+        path: '/login',
+        name: 'Login',
+        component: Landing
+    },
+    {
         path: '/',
         name: 'Home',
         component: Home,
+        meta: {
+            requiresAuth: true,
+            breadcrumb: [
+                { name: 'Home'}
+            ]
+        }
+    },
+    {
+        path: '/reset-pass',
+        name: 'Password Reset',
+        component: PasswordResetPage,
         meta: {
             breadcrumb: [
                 { name: 'Home'}
@@ -30,6 +48,7 @@ export default new Router({
         name: 'FolderListPage',
         component: FolderListPage,
         meta: {
+            requiresAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'My Folders'}
@@ -41,6 +60,7 @@ export default new Router({
         name: 'FolderEditPage',
         component: FolderEditPage,
         meta: {
+            requiresAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'My Folders', link: '/folders'},
@@ -53,6 +73,7 @@ export default new Router({
         name: 'FolderAddFromLibraryPage',
         component: FolderAddFromLibraryPage,
         meta: {
+            requiresAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'My Folders', link: '/folders'},
@@ -66,6 +87,7 @@ export default new Router({
         name: 'KeyItemsListPage',
         component: KeyItemListPage,
         meta: {
+            requiresAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'My KeyItems'}
@@ -77,6 +99,7 @@ export default new Router({
         name: 'GameCardsListPage',
         component: CardLibraryViewPage,
         meta: {
+            requiresAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'My Chip Pool'}
@@ -88,6 +111,7 @@ export default new Router({
         name: 'CodeEditPage',
         component: CodeEditPage, 
         meta: {
+            requiresAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'Edit Card'},
@@ -100,6 +124,7 @@ export default new Router({
         name: 'PublicFolderListPage',
         component: PublicFolderListPage,
         meta: {
+            requiresAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'Public Folders' }
@@ -111,6 +136,7 @@ export default new Router({
         name: 'ComboListPage',
         component: ComboListPage,
         meta: {
+            requiresAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'Combos' }
@@ -122,7 +148,7 @@ export default new Router({
         name: 'EconomyPage',
         component: EconomyPage,
         meta: {
-            requiresAuth: true,
+            requiresAdminAuth: true,
             breadcrumb: [
                 { name: 'Home', link: '/'},
                 { name: 'Economy' }

@@ -48,6 +48,7 @@ export default {
             this.$api.auth.logout()
             .then(() => {
                 this.$store.dispatch('logoutUser');
+                this.$router.push({path:'/login'});
             }).catch(err => {
                 let alert = { message: err, type: "danger" };
                 this.$store.dispatch('alerts/addAlert', alert, { namespaced: true});

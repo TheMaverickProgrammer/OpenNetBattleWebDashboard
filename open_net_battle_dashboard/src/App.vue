@@ -1,30 +1,25 @@
 <template>
   <div id="app">
-    <div v-if="$store.state.user.username != ''">
-      <div id="app-content"> 
+    <div id="app-content"> 
+      <div v-if="$store.state.user.username != ''">
         <Navbar :user="$store.state.user.username" :monies="$store.state.user.monies"/>
-        <transition name="fade" mode="out-in">    
-          <keep-alive :include="keepAliveList">    
-            <router-view/>
-          </keep-alive>
-        </transition>
       </div>
-    </div>
-    <div v-else>
-      <Landing ref="landingPage"/>
+      <transition name="fade" mode="out-in">    
+        <keep-alive :include="keepAliveList">    
+          <router-view/>
+        </keep-alive>
+      </transition>
     </div>
   </div>
 </template>
 
 <script>
 import Navbar from '@/components/Navbar';
-import Landing from '@/pages/Landing';
 
 export default {
   name: 'App',
   components: {
-    Navbar,
-    Landing
+    Navbar  
   },
   props: {
   },
@@ -50,10 +45,6 @@ export default {
         this.makeAlert(alert.message, alert.type, alert.title);
       }
     });
-  },
-  mounted() {
-    // try auto-logging in
-    this.$refs.landingPage.autoLogin();
   },
   beforeDestroy() {
     this.unsubscribe();
