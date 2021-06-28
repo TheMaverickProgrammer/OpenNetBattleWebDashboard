@@ -13,7 +13,7 @@
     "bootstrap-vue": "^2.9.0",
     "clipboard": "^2.0.6",
     "core-js": "^3.6.4",
-    "prismjs": "^1.21.0",
+    "prismjs": "^1.24.0",
     "uuid": "^7.0.3",
     "vue": "^2.6.11",
     "vue-prism-editor": "^0.5.1",
